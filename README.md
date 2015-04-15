@@ -3,27 +3,36 @@ Web app that displays a tweet stream based on given keywords.
 It uses NodeJS to listen to a tweet stream and emits tweets to the browser using Socket.io.
 
 
-## Installation
+## Usage
+
+
 ```
 npm install
 	
 ```
 
-
-
-## Usage
-
-
 If you don't have a [Twitter app](https://dev.twitter.com/apps) create one to use the streaming API. 
 
 In server/creds.js put your keys and access tokens
 
-Then 
+```javascript
+var creds = {
+	twitter: {
+		"consumer_key": "xxx",
+		"consumer_secret": "xxx",
+		"token": "xxx",
+		"token_secret": "xxx"
+	}
+};
+```
+
+Then run :
 
 ```
 gulp start
 
 ```
+
 
 You can access the app via localhost:8080 
 
@@ -33,12 +42,10 @@ You can access the app via localhost:8080
 
 ## Styling
 
-You can completely change the styling by changing the css in public/app/css/tweet-dom-creator.css 
-the html in public/app/templates/tweet-dom.html
+You can completely change the styling by changing the css in public/app/css/tweet-dom-creator.css and public/app/css/main.css
+and the html in public/app/templates/tweet-dom.html
 
-## Client-side editing
-
-For client-side editing & debugging run : 
+Run watch-scripts task to see the changes : 
 
 ```
 gulp watch-scripts
