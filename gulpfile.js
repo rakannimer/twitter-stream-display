@@ -39,15 +39,25 @@ gulp.task('scripts', function() {
 
 });
 
-
-gulp.task('server', function(){
-  gulp.start('watch');
+var launchNodemon = function(){
   nodemon({
-    script: 'server.js'
+    script: './server/app.js',
+     ignore: [ "public/*"],
   });
+};
+
+gulp.task('watch-all',function() {
+  gulp.start('watch-scripts');
+  launchNodemon();
 });
 
-gulp.task('watch', function() {
+gulp.task('start', function(){
+  gulp.start('scripts');
+  gulp.start('css');
+  launchNodemon();
+});
+
+gulp.task('watch-scripts', function() {
   gulp.start('scripts');
   gulp.start('css');
   gulp.watch(['./public/app/js/*'], [ 'scripts']);
