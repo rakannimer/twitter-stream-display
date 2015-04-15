@@ -1,0 +1,8 @@
+body { 
+	margin:0; padding:0; 
+}
+#map { 
+	position:relative;  
+	width:48%; 
+	height:600px;
+}

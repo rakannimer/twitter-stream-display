@@ -1,0 +1,107 @@
+.tweet {
+    width: 488px;
+    min-height: 75px;
+    border-bottom: 1px solid #e1e8ed;
+    border-left: 1px solid #e1e8ed;
+    border-right: 1px solid #e1e8ed;
+    padding: 5px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: auto;
+    text-align: left;
+}
+
+.tweet:hover{
+    cursor: pointer;
+    background: #f5f8fa;
+}
+
+.profile-image{
+    max-width: 50px;
+    float: left;
+}
+
+.profile-image img{
+    border-radius: 10px;
+    max-height: 50px;
+    max-width: 50px;
+}
+
+.user-info{
+    height: 20px;
+    float: left;
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+.user-info a:link, .user-info a:visited{
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-info a:hover{
+    color: #2FC2EF;
+    text-decoration: underline;
+}
+
+.username{
+    font-weight: bold;
+}
+
+.screen-name, .timestamp{
+    color: #8899a6;
+    margin-left: 5px;
+}
+
+.tweet-content{
+    float: left;
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+.tweet-content a:link, .tweet-content a:visited{
+    color: #2FC2EF;
+    text-decoration: none;
+}
+
+.tweet-content a:hover{
+    text-decoration: underline;
+}
+
+.tweet-image{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: inherit;
+    text-align: center;
+}
+
+.tweet-image img{
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 430px;
+    max-height: 330px;
+    border-radius: 5px;
+}
+
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    line-height: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+    width: 0;
+}
+
+
+.tweet_container {
+    max-height : 600px;
+    overflow-y : auto;
+}
+
+.clearfix { display: inline-block; }
+/* start commented backslash hack \*/
+* html .clearfix { height: 1%; }
+.clearfix { display: block; }
+/* close commented backslash hack */
+

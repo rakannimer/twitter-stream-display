@@ -1,0 +1,62 @@
+<html>
+	<head>
+			
+		<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+		<link href='./app/app.min.css' rel='stylesheet' />
+	</head>
+<body>
+<div class="container">
+
+	
+	<div class="row">
+		<div class="col-md-6">
+
+			<div class="row" style="">
+				<div class="form-group col-md-6">
+					<label for="search_terms">Search Terms</label>
+		    		<input type="text" class="form-control" id="search_terms" placeholder="Search terms">
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-group col-md-2">
+					<button type="button" class="btn btn-success" id="search_button">Search</button>		  
+		  		</div>
+
+		  		<div class="form-group col-md-3">
+					<button type="button" class="btn btn-danger" id="stop_stream">Stop Stream</button>		  
+		  		</div>
+		  		
+
+		  		<div class="form-group col-md-3">
+					<button type="button" class="btn btn-info" id="restart_stream">Restart Stream</button>		  
+		  		</div>
+		  	</div>
+
+
+			<div class="row">
+				<div class="form-group col-md-4">
+					<label for="tweet_frequency" >Seconds between tweets</label>
+		    		<input type="text" class="form-control" id="tweet_frequency" placeholder="Seconds between Tweets" value="2">
+				</div>
+				<div class="form-group col-md-2" style="margin-top:43px">
+					<button type="button" class="btn btn-success" id="update_frequency">Update</button>		  
+		  		</div>
+			</div>
+			
+		  	<div>
+		  		<div class="col-md-12">
+					<div class="alert" style="display:none;" role="alert" id ="alert"> Connected :) </div>
+				</div>
+		  	</div>
+		</div>
+		<div class="col-md-6">
+			<div class="tweet_container"  id='tweets' ></div>
+		</div>
+	</div>
+
+	<script src='./app/app.min.js'></script>
+</div>
+</body>
+</html>
+

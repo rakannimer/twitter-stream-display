@@ -1,0 +1,24 @@
+<div class="tweet clearfix">
+    <div class="profile-image">
+        <img src="<%= tweet.user.profile_background_image_url_https %>">
+    </div>
+    <div class="user-info">
+        <span class="username">
+            <a href="https://twitter.com/<%= tweet.user.screen_name %>" target="_blank"><%= tweet.user.screen_name %></a>
+        </span>
+        <span class="screen-name">
+            @<%= tweet.user.screen_name %>
+        </span>
+        <span class="timestamp">
+            <%= tweet.created_at %>
+        </span>
+    </div>
+    <div class="tweet-content">
+        <%= tweet.text %>
+        <% if(tweet.entities !== undefined && tweet.entities.media !== undefined ){ %>
+            <div class="tweet-image">
+                <img src="<%= tweet.entities.media[0].media_url_https %>">
+            </div>
+        <% } %>
+    </div>
+</div>

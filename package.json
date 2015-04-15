@@ -1,0 +1,33 @@
+{
+  "name": "tweet-streams",
+  "description": "Node.js, Socket.io, Twitter streams sending to client",
+  "dependencies": {
+    "body-parser": "^1.12.2",
+    "express": "^4.12.3",
+    "fifo": "^2.0.0",
+    "gulp-nodemon": "^2.0.2",
+    "html-linkify": "^1.2.0",
+    "mapbox.js": "^1.6.5",
+    "node-tweet-stream": "^1.6.0",
+    "socket.io": "^1.3.5",
+    "socket.io-browserify": "^0.9.6",
+    "tweet-dom-creator": "git://github.com/RakanNimer/tweet-dom-creator.git",
+    "twit": "^1.1.20"
+  },
+  "devDependencies": {
+    "jquery": "^2.1.3",
+    "mapbox": "^0.1.0",
+    "browserify": "^9.0.8",
+    "del": "^1.1.1",
+    "gulp": "^3.8.10",
+    "gulp-concat": "^2.4.3",
+    "gulp-jshint": "^1.9.0",
+    "gulp-minify-css": "^0.3.13",
+    "gulp-rename": "^1.2.0",
+    "gulp-streamify": "0.0.5",
+    "gulp-uglify": "^1.0.2",
+    "stringify": "^3.1.0",
+    "underscore": "^1.8.3",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
