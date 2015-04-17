@@ -103,5 +103,17 @@
 /* start commented backslash hack \*/
 * html .clearfix { height: 1%; }
 .clearfix { display: block; }
-/* close commented backslash hack */
+
+.fancy_border {
+      box-shadow: 0px 0px 10px 10px white inset, 0px 23px 21px -33px #000;
+      border-radius: 10%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      /* background-color: #f1f1f1; */
+      border-color: #167ac6;
+      border: solid 4px #167ac6;
+      /* width: 450px !important; */
+}
 
