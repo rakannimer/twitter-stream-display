@@ -1,22 +1,34 @@
 var express = require('express'),
 	io = require('socket.io')(8075),
 	fs = require('fs'),
+	assert = require('assert'),
 	tweet_queue = require('fifo')(),
 	Twitter = require('node-tweet-stream'),
-	twitter_creds = require('./creds.js').twitter;
-	t = new Twitter(twitter_creds);
+	twitter_creds = require('./creds.js').twitter,
+	t = new Twitter(twitter_creds),
+	bodyParser = require('body-parser'),
+	db = require('./db.js');
 
 
-var app = express();
-var port = process.env.PORT || 8080;
-var users = [];
-var bodyParser = require("body-parser");
-var currentSearchTerms = ''
+
+
+
+
+var app = express(),
+	port = process.env.PORT || 8080,
+	users = [],
+	currentSearchTerms = '',
+	tweet,
+	data,
+	tweet_obj,
+	timeBetweenTweets = 100;
+
+
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
+db.init();
 
-var tweet = {};
-var data = {};
+
 var emit_tweet = function() {
 	if (!tweet_queue.isEmpty()) {
 		tweet = tweet_queue.shift();
@@ -26,15 +38,42 @@ var emit_tweet = function() {
 		};
 		io.emit('server:tweet_received', JSON.stringify(data));
 	}
-	
-}
+};
+
 var handle_tweet_received = function(tweet) {
-	tweet_queue.push(tweet);
-}
-currentSearchTerms = 'ice cream';
-t.on('tweet',handle_tweet_received);
+	if (tweet.coordinates !== null) {
+		if (tweet.coordinates){
+			console.log("Found Location !");
+			var location = {"lat": tweet.coordinates.coordinates[0],"lng": tweet.coordinates.coordinates[1]};
+			tweet_obj = {
+				tweet: tweet,
+				location : location,
+				search_terms : currentSearchTerms
+			};
+
+			db.insertTweet(tweet_obj, function(result){
+				console.log("Inserted into mongo");
+			});
+		}
+	}
+	else {
+		tweet_obj = {
+			tweet: tweet,
+			location : null,
+			search_terms : currentSearchTerms
+		};
+	}
+	
+	tweet_queue.push(tweet_obj);
+};
+
+currentSearchTerms = 'dogs,pets,cats';
+t.on('tweet', handle_tweet_received);
+
 t.track(currentSearchTerms);
-var currentInterval = setInterval(emit_tweet,2000);
+//t.location('-180,-90,180,90',true);
+
+var currentInterval = setInterval(emit_tweet,timeBetweenTweets);
 
 app.post('/update_frequency', function(req, res) {
 	console.log("updating frequency");
@@ -42,7 +81,6 @@ app.post('/update_frequency', function(req, res) {
 	clearInterval(currentInterval);
 	currentInterval = setInterval(emit_tweet,new_interval);
 });
-
 
 app.post('/search', function(req, res) {
 	var search_terms = req.body.search_terms;
@@ -53,9 +91,13 @@ app.post('/search', function(req, res) {
 	res.send("ok");
 });
 
-app.listen(port);
-console.log("Application is running on http://localhost:8080")
+app.post('/locations', function(req, res) {
 
+});
+
+app.listen(port);
+
+console.log("Application is running on http://localhost:8080")
 
 io.sockets.on('connection',function(socket){
 	console.log('User connected  ');
@@ -72,7 +114,6 @@ io.sockets.on('connection',function(socket){
 		console.log(o);
 	});
 });
-
 
 var stopStream = function() {
 	socket.disconnect();

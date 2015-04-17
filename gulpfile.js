@@ -10,6 +10,9 @@ var fs = require('fs');
 var nodemon = require('gulp-nodemon');
 var streamify = require('gulp-streamify');
 var stringify = require('stringify');
+//var exec = require('gulp-exec');
+var exec = require('child_process').exec;
+
 
 // Lint Task
 gulp.task('lint', function() {
@@ -30,7 +33,6 @@ gulp.task('css', function() {
 // Concatenate & Minify JS
 gulp.task('scripts', function() {
 
-
     return browserify({entries:'./public/app/js/client.js', debug:true})
                 .transform(stringify(['.html']))
                 .bundle()
@@ -48,13 +50,20 @@ var launchNodemon = function(){
 
 gulp.task('watch-all',function() {
   gulp.start('watch-scripts');
+  exec('mongod');
   launchNodemon();
 });
 
 gulp.task('start', function(){
   gulp.start('scripts');
   gulp.start('css');
+//  exec('mongod');
+  exec('mongod --dbpath=/data/db --port 27017', function(err,stdout,stderr) {
+    console.log(stdout);
+    console.log(stderr);
+  });
   launchNodemon();
+
 });
 
 gulp.task('watch-scripts', function() {

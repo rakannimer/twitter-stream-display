@@ -32,14 +32,21 @@ var tweetStream = {
 		});
 	},
 	start_tweet_stream: function() {
-		this.socket.on("server:tweet_received", function(tweet_data){
+		this.socket.on('server:tweet_received', function(tweet_data){
 			tweet_data = JSON.parse(tweet_data);
 			console.log(tweet_data.status);
 			switch(tweet_data.status) {
 				case 'OK':
-					tweetDomCreator.prependToNode(tweet_data.tweet, "#tweets");
+					if (tweet_data.tweet.location !== null) {
+						tweetNode = tweetDomCreator.createNode(tweet_data.tweet.tweet);
+						var $htmlTweetNode = $('<div />', {html:tweetNode});
+						$htmlTweetNode.find('.tweet').addClass("fancy_border");
+						$("#tweets").prepend($htmlTweetNode.html());
+					}
+					else {
+						tweetDomCreator.prependToNode(tweet_data.tweet.tweet, "#tweets");
+					}
 					break;
-					//alert("Received unexpected: "+ JSON.stringify(tweet_data));
 			}
 			//
 		});
