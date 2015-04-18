@@ -23,7 +23,7 @@ gulp.task('lint', function() {
 // Compile Our CSS
 gulp.task('css', function() {
 
-  return gulp.src(['./public/app/css/*.css','./node_modules/mapbox.js/theme/style.css', './node_modules/bootstrap-material-design/dist/css/material.css'])
+  return gulp.src(['./public/app/css/*.css','./node_modules/mapbox.js/theme/style.css', './node_modules/bootstrap/dist/css/bootstrap.css'])
     .pipe(concat('app.min.css'))
     .pipe(minifyCSS())
     .pipe(gulp.dest('./public/app/'));
