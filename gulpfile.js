@@ -13,7 +13,6 @@ var stringify = require('stringify');
 //var exec = require('gulp-exec');
 var exec = require('child_process').exec;
 
-
 // Lint Task
 gulp.task('lint', function() {
   return gulp.src('./public/app/js/*.js')
@@ -24,11 +23,13 @@ gulp.task('lint', function() {
 // Compile Our CSS
 gulp.task('css', function() {
 
-  return gulp.src(['./public/app/css/*.css','./node_modules/mapbox.js/theme/style.css', './node_modules/bootstrap/dist/css/bootstrap.css'])
+  return gulp.src(['./public/app/css/*.css','./node_modules/mapbox.js/theme/style.css', './node_modules/bootstrap-material-design/dist/css/material.css'])
     .pipe(concat('app.min.css'))
     .pipe(minifyCSS())
     .pipe(gulp.dest('./public/app/'));
 });
+
+
 
 // Concatenate & Minify JS
 gulp.task('scripts', function() {
@@ -41,34 +42,39 @@ gulp.task('scripts', function() {
 
 });
 
-var launchNodemon = function(){
-  nodemon({
-    script: './server/app.js',
-     ignore: [ "public/*"],
-  });
-};
 
 gulp.task('watch-all',function() {
   gulp.start('watch-scripts');
-  exec('mongod');
-  launchNodemon();
+  //exec('mongod');
+  gulp.start('nodemon');
 });
 
-gulp.task('start', function(){
-  gulp.start('scripts');
-  gulp.start('css');
-//  exec('mongod');
-  exec('mongod --dbpath=/data/db --port 27017', function(err,stdout,stderr) {
-    console.log(stdout);
-    console.log(stderr);
-  });
-  launchNodemon();
-
+gulp.task('nodemon',function() {
+  var called = false;
+  return nodemon({
+      script: './server.js',
+      watch: [ "server/*"],
+    })
 });
 
-gulp.task('watch-scripts', function() {
-  gulp.start('scripts');
-  gulp.start('css');
+gulp.task('db', function() {
+  return exec('mongod --dbpath=/data/db --port 27017', function(err,stdout,stderr) {
+      console.log(stdout);
+      console.log(stderr);
+    });
+});
+
+gulp.task('start', ['scripts', 'css', 'db'], function(){
+
+  gulp.start('nodemon');
+  //gulp.src('app')
+ //   .pipe();
+});
+
+
+
+
+gulp.task('watch-scripts', ['scripts','css'], function() {
   gulp.watch(['./public/app/js/*'], [ 'scripts']);
   gulp.watch(['./public/app/css/*'], ['css']);
 });

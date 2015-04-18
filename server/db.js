@@ -38,6 +38,16 @@ var db = {
     		console.log("Inserted a document into the tweets collection");
     		callback(result);
 		})
+	},
+	getTweetLocations: function(search_terms, callback) {
+		var tweets = db_instance.collection('tweets');
+
+		tweets.find({search_terms:'dogs,pets,cats'}, {location: 1}).toArray(function(err, docs) {
+		    assert.equal(err, null);
+		    console.log("Found "+ docs.length+" records");
+		    console.log(docs[0].location);
+		    callback(docs);
+		  }); 
 	}
 }
 

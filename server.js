@@ -4,11 +4,10 @@ var express = require('express'),
 	assert = require('assert'),
 	tweet_queue = require('fifo')(),
 	Twitter = require('node-tweet-stream'),
-	twitter_creds = require('./creds.js').twitter,
+	twitter_creds = require('./server/creds.js').twitter,
 	t = new Twitter(twitter_creds),
 	bodyParser = require('body-parser'),
-	db = require('./db.js');
-
+	db = require('./server/db.js');
 
 var app = express(),
 	port = process.env.PORT || 8080,
@@ -25,9 +24,6 @@ app.use(express.static('public/'));
 app.use(bodyParser.urlencoded({ extended: false }));	
 
 db.init();
-
-
-
 
 var emit_tweet = function() {
 	if (!tweet_queue.isEmpty()) {
@@ -54,6 +50,7 @@ var handle_tweet_received = function(tweet) {
 			db.insertTweet(tweet_obj, function(result){
 				console.log("Inserted into mongo");
 			});
+			console.log("Inserted into mongo");
 		}
 	}
 	else {
@@ -75,9 +72,9 @@ t.track(currentSearchTerms);
 
 var currentInterval = setInterval(emit_tweet,timeBetweenTweets);
 
-app.get('*', function(req, res){
-	res.sendFile(__dirname+'/../public/index.html');
-});
+// app.get('*', function(req, res){
+// 	res.sendFile(__dirname + '/public/index.html');
+// });
 
 app.post('/update_frequency', function(req, res) {
 	console.log("updating frequency");
@@ -96,10 +93,17 @@ app.post('/search', function(req, res) {
 });
 
 app.post('/locations', function(req, res) {
-
+	console.log("LOCATION LOCATION LOCATION");
+	db.getTweetLocations('asd', function(tweets) {
+		response = {
+			'status' : 'OK',
+		    'tweets' : tweets 
+		};
+		res.send(response);
+	});
 });
 
-app.listen(port,'localhost');
+app.listen(port);
 
 console.log("Application is running on http://localhost:8080")
 
