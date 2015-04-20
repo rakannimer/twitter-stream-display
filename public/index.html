@@ -1,44 +1,62 @@
+<!--
 <html>
 	<head>
 			
 		<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
 		<link href='./app/app.min.css' rel='stylesheet' />
 	</head>
-<body>
+<body class="easy-sidebar-active">
+
+	<nav class="navbar navbar-inverse easy-sidebar">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Easy-Sidebar</a>
+			</div>
+
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+				<li><a href="#">Link</a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+						<li class="divider"></li>
+						<li><a href="#">One more separated link</a></li>
+					</ul>
+				</li>
+			</ul>
+			<form class="navbar-form" role="search">
+				<div class="form-group">
+					<input type="text" class="form-control" placeholder="Search">
+				</div>
+				<button type="submit" class="btn btn-default">Submit</button>
+			</form>
+			<ul class="nav navbar-nav">
+				<li><a href="#">Link</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="container-fluid easy-sidebar-container">
+		<div class="row">
+		    	<input type="text" class="form-control text-input" id="search_terms" placeholder="Search terms">
+			</div>
+		<div class="row">
+			<button class="btn easy-sidebar-toggle">Toggle Sidebar</button>
+		</div>
+	</div>
 
 
-	<!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Twitter Stream Display</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
-            <li class=""><a href ="/map">Map</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-	<div class="container">
-	<div class="row">
-		<div class="col-md-6">
-
-			<div class="row" style="">
+	<div class="col-md-6" id="controls">
+		<div class="row" style="">
 				<div class="form-group col-md-6">
 					<label for="search_terms">Search Terms</label>
 		    		<input type="text" class="form-control" id="search_terms" placeholder="Search terms">
 				</div>
-			</div>
-
-			<div class="row">
 				<div class="form-group col-md-2">
 					<button type="button" class="btn btn-success" id="search_button">Search</button>		  
 		  		</div>
@@ -55,36 +73,343 @@
 		  		<div class="form-group col-md-3">
 					<button type="button" class="btn btn-info" id="show_on_map">Show On Map</button>		  
 		  		</div>
-		  	</div>
-
-
-			<div class="row">
-				<div class="form-group col-md-4">
-					<label for="tweet_frequency" >Seconds between tweets</label>
-		    		<input type="text" class="form-control" id="tweet_frequency" placeholder="Seconds between Tweets" value="2">
-				</div>
-				<div class="form-group col-md-2" style="margin-top:43px">
-					<button type="button" class="btn btn-success" id="update_frequency">Update</button>		  
-		  		</div>
 			</div>
-			
-		  	<div>
-		  		<div class="col-md-12">
-					<div class="alert" style="display:none;" role="alert" id ="alert"> Connected :) </div>
-				</div>
-		  	</div>
-		  	<div class="row">
-		  		<div id="map">
-				</div>
-		  	</div>
-		</div>
-		<div class="col-md-6">
-			<div class="tweet_container"  id='tweets' ></div>
-		</div>
 	</div>
 
-	<script src='./app/app.min.js'></script>
+
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="col-md-6" id="controls">
+
+
+				<div class="row" style="">
+					<div class="form-group col-md-6">
+						<label for="search_terms">Search Terms</label>
+			    		<input type="text" class="form-control" id="search_terms" placeholder="Search terms">
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="form-group col-md-2">
+						<button type="button" class="btn btn-success" id="search_button">Search</button>		  
+			  		</div>
+
+			  		<div class="form-group col-md-3">
+						<button type="button" class="btn btn-danger" id="stop_stream">Stop Stream</button>		  
+			  		</div>
+			  		
+
+			  		<div class="form-group col-md-3">
+						<button type="button" class="btn btn-info" id="restart_stream">Restart Stream</button>		  
+			  		</div>
+
+			  		<div class="form-group col-md-3">
+						<button type="button" class="btn btn-info" id="show_on_map">Show On Map</button>		  
+			  		</div>
+			  	</div>
+
+
+				<div class="row">
+					<div class="form-group col-md-4">
+						<label for="tweet_frequency" >Seconds between tweets</label>
+			    		<input type="text" class="form-control" id="tweet_frequency" placeholder="Seconds between Tweets" value="2">
+					</div>
+					<div class="form-group col-md-2" style="margin-top:43px">
+						<button type="button" class="btn btn-success" id="update_frequency">Update</button>		  
+			  		</div>
+				</div>
+				
+			  	<div>
+			  		<div class="col-md-12">
+						<div class="alert" style="display:none;" role="alert" id ="alert"> Connected :) </div>
+					</div>
+			  	</div>
+			  	<div class="row">
+			  	</div>
+
+		</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+				<div id="map">
+
+				</div>
+		</div>
+		<div class="col-md-6">	
+			<div class="tweet_container"  id='tweets' ></div>	
+		</div>
+	</div>
+	<div class="container">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="tweet_container"  id='tweets' ></div>
+				</div>
+			</div>
+
+		<script src='./app/app.min.js'></script>
+	</div>
 </div>
+
+
+</body>
+</html>
+
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  	<title> Twitter Stream Display </title>
+	<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='./app/app.min.css' rel='stylesheet' />
+</head>
+<body class="application">
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../">
+          <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="navbar-brand" href="./">Twitter Stream Dashboard</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="/">Home</a></li>
+          <li><a href="https://github.com/RakanNimer/twitter-stream-display/">Source</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-sm-2">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Sidebar
+          </div>
+          <div class="chart-stage controls">
+          	<div class="form-group">
+          			<span class="input-label">Search Terms</span>
+					<input type="text" class="form-control" placeholder="Search" id="search_terms">
+										
+					<div style="margin-top:10px">
+						<button type="submit" class="btn btn-default" id="search_button">Submit</button>
+					</div>
+					<div class="paper-toggle">
+						<input type="checkbox" id="stream_toggle" name="stream_toggle" class="switch" />
+						<label for="stream_toggle">Show Stream</label>
+					</div>
+					<div class="paper-toggle">
+						<input type="checkbox" id="heatmap_toggle" name="heatmap_toggle" class="switch" />
+						<label for="heatmap_toggle">Show Heatmap</label>
+					</div>
+					<div class="paper-toggle">
+						<input type="checkbox" id="markers_toggle" name="markers_toggle" class="switch" />
+						<label for="markers_toggle">Show Markers</label>
+					</div>
+			</div>
+			<div class="form-group">
+				<label for = "update_frequency"> Seconds between tweets</label>   <span class="input-label"></span>
+				<div class="row">
+					<input type="text" style="margin-left:10px; width:36%" class="form-control col-md-3" placeholder="Seconds" id="tweet_frequency">
+					<button type="submit" class="btn btn-default col-md-5" style="margin-left:10px; " id="update_frequency">Update</button>
+				</div>
+			</div>
+			<div>
+				<h5>Mined terms</h5>
+				<ul class="tags" data-bind="foreach: response">
+					<a class="grow" href="">
+						<li class="tag">
+							<div class="mined-searches-terms" style="" >
+								<span data-bind="text: search_terms"></span>
+							</div>
+							<div class ="mined-searches-count" data-bind="text: count">0</div>
+						</li>
+					</a>
+				</ul>
+			</div>
+				<!--
+		      <ul class="tags">
+
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw purple"></span> HTML</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw blue"></span> CSS</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw yellow"></span> SASS</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw dark-blue"></span> LESS</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw light-purple"></span> HAML</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw pink"></span> RUBY</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw green"></span> COFFEESCRIPT</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw cyan"></span> yeoman</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw purple"></span> angular.js</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw yellow"></span> grunt</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw blue"></span> yaml</li></a>
+		        <a class="grow" href=""><li class="tag"><span class="fa fa-circle fa-fw dark-blue"></span> javascript</li></a>
+		      </ul>
+		  		-->
+		    </div>	
+
+            <img data-src="holder.js/100%x650/white">
+          </div>
+          <div class="chart-notes">
+
+          </div>
+        </div>
+      
+      <div class="col-sm-9">
+        <div class="row">
+          <div class="col-sm-7">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Top Right
+                <div id="map">
+                </div>
+              </div>
+              <div class="chart-stage">
+                <img data-src="holder.js/100%x240/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+          
+
+   			<div class="col-sm-5 tweet_container">
+
+          		<div class="load-wrapp center-block hide" id="tweets_loading">
+				  	<div class="load-1">
+                		<p></p>
+                		<div class="line"></div>
+                		<div class="line"></div>
+                		<div class="line"></div>
+            		</div>
+            		<!--
+				  	<div class="load-9">
+				        <p></p>
+				        <div class="spinner">
+				        	<div class="bubble-1"></div>
+				        	<div class="bubble-2"></div>
+						</div>
+					</div>
+					-->
+				 </div>
+				 <h5>Streamed Tweets : </h5>
+          		<div id="tweets" class=""></div>
+          	</div>
+
+
+
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                First Left
+              </div>
+              <div class="chart-stage">
+              	<!--
+              	<div id="tweets">
+              	</div>
+              	-->
+                <img data-src="holder.js/100%x120/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+				Second Left	
+	          </div>
+              <div class="chart-stage">
+                <img data-src="holder.js/100%x120/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Cell Title
+              </div>
+              <div class="chart-stage">
+                <img data-src="holder.js/100%x120/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Cell Title
+              </div>
+              <div class="chart-stage">
+                <img data-src="holder.js/100%x120/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Cell Title
+              </div>
+              <div class="chart-stage">
+                <img data-src="holder.js/100%x120/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Cell Title
+              </div>
+              <div class="chart-stage">
+                <img data-src="holder.js/100%x120/white">
+              </div>
+              <div class="chart-notes">
+                Notes about this chart
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+    <hr>
+
+  </div>
+
+
+	<script src='./app/app.min.js'></script>
+
 </body>
 </html>
 

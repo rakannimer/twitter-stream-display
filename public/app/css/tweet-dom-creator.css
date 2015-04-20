@@ -1,5 +1,9 @@
+
 .tweet {
+    /*
     width: 488px;
+    */
+    width: 421px;
     min-height: 75px;
     border-bottom: 1px solid #e1e8ed;
     border-left: 1px solid #e1e8ed;
@@ -8,6 +12,7 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: auto;
     text-align: left;
+    background: rgba(255,255,255,0.6);
 }
 
 .tweet:hover{
@@ -78,7 +83,7 @@
     margin-left: auto;
     margin-right: auto;
     max-width: 430px;
-    max-height: 330px;
+    max-height: 100px;
     border-radius: 5px;
 }
 
@@ -94,10 +99,7 @@
 }
 
 
-.tweet_container {
-    max-height : 600px;
-    overflow-y : auto;
-}
+
 
 .clearfix { display: inline-block; }
 /* start commented backslash hack \*/

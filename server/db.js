@@ -26,6 +26,7 @@ var db = {
 			console.log("Connected to mongo");
 			assert.equal(null, err);
 			db_instance = db;
+			
 		});
 	},
 	insertTweet: function(tweet,callback) {
@@ -42,12 +43,24 @@ var db = {
 	getTweetLocations: function(search_terms, callback) {
 		var tweets = db_instance.collection('tweets');
 
-		tweets.find({search_terms:'dogs,pets,cats'}, {location: 1}).toArray(function(err, docs) {
+		tweets.find({search_terms:search_terms}, {location: 1}).toArray(function(err, docs) {
 		    assert.equal(err, null);
 		    console.log("Found "+ docs.length+" records");
 		    console.log(docs[0].location);
 		    callback(docs);
 		  }); 
+	}
+	
+	,
+	getSearchTerms: function(callback) {
+		if (db_instance === null) {
+			return false;
+		}
+		var tweets = db_instance.collection('tweets');
+		tweets.group({'search_terms':true}, {}, {"count":0}, function (obj, prev) { prev.count++; }, true, function(err, results) {
+			callback(results);
+		});
+
 	}
 }
 

@@ -1,0 +1,72 @@
+@import url('http://fonts.googleapis.com/css?family=Patua+One');
+
+.tags {
+	margin-left:0px;
+	padding-left: 0px;
+}
+.tags>a>li:hover {
+  color:#fff;
+  background-color: #262626;
+}
+.tags li {
+  list-style:none;
+  display:inline-block;
+  background-color:#F0F2F4;
+  border-radius:5px;
+  padding:5px 10px;
+  font-size:18px;
+  font-family: 'Patua One', cursive;
+  color:#B2BAC2;
+  box-shadow:0px 0px 7px black;
+  margin:3px 1px 3px 1px;
+  line-height:27px;
+/*  text-transform:uppercase;*/
+}
+.purple {
+  color:#913B53;
+  font-size:13px;
+}
+.blue {
+  color:#39ADD1;
+  font-size:13px;
+}
+.yellow {
+  color:#E0AB18;
+  font-size:13px;
+}
+.dark-blue {
+  color:#2570A8;
+  font-size:13px;
+}
+.light-purple {
+  color:#9D8AC7;
+  font-size:13px;
+}
+.pink {
+  color:#E15258;
+  font-size:13px;
+}
+.orange {
+  color:#F9845B;
+  font-size:13px;
+}
+.green {
+  color:#51B46D;
+  font-size:13px;
+}
+.cyan {
+  color:#53BBB4;
+  font-size:13px;
+}
+
+.colors {
+  list-style:none;
+}
+.colors li{
+  display: inline-block;
+  width:15px;
+  height: 15px;
+}
+.fa-circle {
+	font-size: 13px;
+}

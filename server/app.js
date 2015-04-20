@@ -19,8 +19,6 @@ var app = express(),
 	tweet_obj,
 	timeBetweenTweets = 100;
 
-
-
 app.use(express.static('public/'));
 app.use(bodyParser.urlencoded({ extended: false }));	
 

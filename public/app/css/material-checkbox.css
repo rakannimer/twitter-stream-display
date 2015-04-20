@@ -1,0 +1,82 @@
+/*
+Taken from 
+http://codepen.io/mattcooper/pen/npEyu
+
+*/
+body {
+      font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      margin: 0;
+      padding: 24px;
+}
+
+.paper-toggle{
+  clear: both;
+  margin: 20px 0;
+}
+
+.paper-toggle input:empty
+{
+  margin-left: -999px;
+}
+
+.paper-toggle input:empty ~ label
+{
+  position: relative;
+  float: left;
+  line-height: 1.6em;
+  width: 150px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.paper-toggle input:empty ~ label:before, 
+.paper-toggle input:empty ~ label:after
+{
+  position: absolute;
+  display: block;
+  content: ' ';
+  -webkit-transition: all 200ms ease-in;
+  transition: all 200ms ease-in;
+}
+
+.paper-toggle input:empty ~ label:before
+{
+    top: 12px;
+    left: 115px;
+    width: 32px;
+    height: 1px;
+    background-color: #5a5a5a;
+}
+
+input.switch:empty ~ label:after
+{
+    top: 4.5px;
+    left: 100px;
+    width: 1.4em;
+    height: 8px;
+    bottom: 0.1em;
+    margin-left: 0.1em;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: solid 2px;
+    border-color: #5a5a5a;  
+}
+
+.paper-toggle input:checked ~ label:before
+{
+  background-color: #0f9d58;
+}
+
+.paper-toggle input:checked ~ label:after
+{
+  left: 140px;
+  background-color: #0f9d58;
+  border-color: #0f9d58;
+}
+
+

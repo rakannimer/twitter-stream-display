@@ -16,7 +16,7 @@ var app = express(),
 	tweet,
 	data,
 	tweet_obj,
-	timeBetweenTweets = 100;
+	timeBetweenTweets = 200;
 
 
 
@@ -64,7 +64,8 @@ var handle_tweet_received = function(tweet) {
 	tweet_queue.push(tweet_obj);
 };
 
-currentSearchTerms = 'dogs,pets,cats';
+
+currentSearchTerms = 'node.js,js,javascript';
 t.on('tweet', handle_tweet_received);
 
 t.track(currentSearchTerms);
@@ -81,6 +82,7 @@ app.post('/update_frequency', function(req, res) {
 	var new_interval = parseInt(req.body.frequency);
 	clearInterval(currentInterval);
 	currentInterval = setInterval(emit_tweet,new_interval);
+	res.send('ok');
 });
 
 app.post('/search', function(req, res) {
@@ -94,12 +96,27 @@ app.post('/search', function(req, res) {
 
 app.post('/locations', function(req, res) {
 	console.log("LOCATION LOCATION LOCATION");
-	db.getTweetLocations('asd', function(tweets) {
+	db.getTweetLocations(currentSearchTerms, function(tweets) {
 		response = {
 			'status' : 'OK',
 		    'tweets' : tweets 
 		};
 		res.send(response);
+	});
+});
+
+
+app.post('/metadata', function(req, res) {
+	console.log("Requesting metadata");
+	db.getSearchTerms(function(result){
+		response = {
+			'status' : 'OK',
+		    'tweets' : result 
+		};
+		res.send(response);
+	});
+	db.getTweetLocations(currentSearchTerms, function(tweets) {
+		
 	});
 });
 

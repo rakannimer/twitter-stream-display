@@ -23,7 +23,7 @@ gulp.task('lint', function() {
 // Compile Our CSS
 gulp.task('css', function() {
 
-  return gulp.src(['./public/app/css/*.css','./node_modules/mapbox.js/theme/style.css', './node_modules/bootstrap/dist/css/bootstrap.css'])
+  return gulp.src([ './node_modules/bootstrap/dist/css/bootstrap.css','./node_modules/mapbox.js/theme/style.css','./node_modules/toastr/toastr.css','./public/app/css/*.css'])
     .pipe(concat('app.min.css'))
     .pipe(minifyCSS())
     .pipe(gulp.dest('./public/app/'));
@@ -34,7 +34,14 @@ gulp.task('css', function() {
 // Concatenate & Minify JS
 gulp.task('scripts', function() {
 
-    return browserify({entries:'./public/app/js/client.js', debug:true})
+  browserify({entries:['./node_modules/toastr/toastr.js'], debug:true})
+                .transform('debowerify')
+                .bundle()
+                .pipe(source('toastr.min.js'))
+                .pipe(gulp.dest('./node_modules/toastr/'));
+  
+
+    return browserify({entries:['./public/app/js/client.js','./node_modules/toastr/toastr.min.js'], debug:true})
                 .transform(stringify(['.html']))
                 .bundle()
                 .pipe(source('app.min.js'))

@@ -3,18 +3,29 @@ var tweetDomCreator = require('./tweet-dom-creator.js');
 var $ = require('jquery');
 var page = require('page');
 var GoogleMapsLoader = require('google-maps');
+var toastr = require('toastr');
+var q = require("q");
+var ko = require('knockout');
+
 
 var tweetStream = {
 	
 	socket : null,
 	tweets_displayed: 0,
-	google_markers: [],
+	markers: [],
 	map: null,
+	latLng_points: [],
+	showing_stream: false,
+	showing_heatmap: false,
+	showing_markers: false,
+	heatmap:null,
+	metadata:null,
 
 	init: function() {
-		var that = this;
+		var self = this;
 		this.init_socket();
 		this.bind_dom_events();
+		this.getMinedMetaData().then(this.render_tags);
 	},
 	init_socket: function(){
 		this.connect();
@@ -23,16 +34,18 @@ var tweetStream = {
 	connect: function(forceNew) {
 		if (io !== undefined ) {
 			this.socket = io.connect('http://localhost:8075');
+			this.show_loading('tweets');
 		}
 	},
 	bindTo_socket_events: function(){
-		var that = this;
+		var self = this;
 		this.socket.on("connected", function() {
-			that.logToUser('Connected :)','success');
+			self.hide_loading('tweets');
+			self.logToUser('Connected (ʘ‿ʘ)','success');
 		});
 		
 		this.socket.on("disconnected", function() {
-			that.logToUser('disconnected','danger');
+			self.logToUser('Disconnected (一_一) ','error');
 		});
 	},
 	start_tweet_stream: function() {
@@ -61,6 +74,13 @@ var tweetStream = {
 	*/
 	logToUser: function(message,type) {
 		
+		if (type !== 'success' && type !== 'info' && type !== 'warning' && type !== 'error') {
+			return false;
+		}
+		toastr[type](message);
+
+		/*
+		// If Twitter bootstrap alerts
 		if (type !== 'success' && type !== 'info' && type !== 'warning' && type !== 'danger') {
 			return false;
 		}
@@ -72,26 +92,174 @@ var tweetStream = {
 				});
 			}, 2000);
 		});
+		*/
+	},
+
+	show_loading: function(component) {
+		switch(component) {
+			case 'tweets':
+				$("#tweets_loading").removeClass('hide');
+				break;
+		}
+	},
+
+	hide_loading: function(component) {
+		switch(component) {
+			case 'tweets':
+				$("#tweets_loading").addClass('hide');
+				break;
+		}
 	},
 
 	bind_dom_events: function() {
-		var that = this;
+		var self = this;
 		$("#search_button").on('click', this.search_clicked);
-		$("#update_frequency").on('click', this.update_frequency_clicked);
-		$("#stop_stream").on('click', function() {
-			that.socket.disconnect();
-			that.socket = null;
-			that.logToUser('Stopped streaming tweets','danger');
+
+		$("#update_frequency").on('click', {context: this}, this.update_frequency_clicked);
+		$("#stream_toggle").on('click', {context: this}, this.stream_toggle);
+		$("#heatmap_toggle").on('click', {context: this}, this.heatmap_toggle);
+		$("#markers_toggle").on('click', {context: this}, this.markers_toggle);
+	},
+
+
+
+	stream_toggle: function(e) {
+		var self = e.data.context;
+		console.log(self.showing_stream);
+		if (self.showing_stream === true) {
+			self.socket.disconnect();
+			self.socket = null;
+			self.logToUser('Disconnected (一_一)','error');
+			console.log("Here");
+		}
+		else {
+			console.log("connecting");
+			self.socket = io.connect('http://localhost:8075',{'forceNew': true});
+			self.bindTo_socket_events();
+			self.start_tweet_stream();
+		}
+		self.showing_stream = !self.showing_stream;
+	},
+
+	heatmap_toggle: function(e) {
+		var self = e.data.context;
+		//heatmap.setMap(heatmap.getMap() ? null : map);
+		if (self.showing_heatmap === false) {
+			if (self.heatmap === null) {
+				self.grab_location_data().then(self.render_heatmap);	
+			}
+			else {
+				self.render_heatmap(self);
+			}
+		}
+		else {
+			self.hide_heatmap();
+		}
+		self.showing_heatmap = !self.showing_heatmap;
+	},
+
+	markers_toggle: function(e) {
+		var self = e.data.context;
+
+		if (self.showing_markers === false) {
+
+			if (self.markers.length === 0) {
+				self.grab_location_data().then(function() {
+					self.render_markers(self);
+				});	
+			}
+			else {
+				self.render_markers(self);
+			}
+		}
+		else {
+			self.hide_markers();
+		}
+		self.showing_markers = !self.showing_markers;
+	},
+
+	render_markers: function(self) {
+
+		for (var i = 0 ; i < self.latLng_points.length; i++) {
+			self.markers.push(self.create_map_marker(self.latLng_points[i]));
+		}
+
+	},
+
+	hide_markers: function() {
+		
+		for (var i = 0 ; i < this.markers.length; i++) {
+			
+			this.markers[i].setMap(null);
+		}
+	},
+
+	hide_heatmap: function() {
+		this.heatmap.setMap(null)
+	},
+
+	render_heatmap: function(self){
+
+		if (self.heatmap === null) {
+			
+			self.heatmap = new google.maps.visualization.HeatmapLayer({
+		 		data: self.latLng_points,
+		 		map: self.map
+		 	});
+		}
+		else {
+		 	self.heatmap.setData(self.latLng_points);
+		 	self.heatmap.setMap(self.map);
+		}
+		
+	},
+
+	grab_location_data: function(callback){
+		var latLng_point;
+		var self = this;
+		var deferred = q.defer();
+		$.post('/locations',{},function(response){
+			
+			if (response.status === 'OK') {
+				var tweets = response.tweets;
+				var current_tweeet;
+				for (var i = 0; i < tweets.length; i++) {
+					latLng_point = new google.maps.LatLng(tweets[i].location.lng,tweets[i].location.lat);
+					self.latLng_points.push(latLng_point);
+					
+				}
+				return deferred.resolve(self);
+
+			}
 		});
-		$("#restart_stream").on('click', function(){
-			that.socket = io.connect('http://localhost:8075',{'forceNew': true});
-			that.bindTo_socket_events();
-			that.start_tweet_stream();
+		return deferred.promise;
+	},
+
+	getMinedMetaData: function() {
+		var deferred = q.defer();
+		var self = this;
+		$.post('/metadata',{},function(response){
+
+			self.metadata = response.tweets;
+			return deferred.resolve(self);
 		});
-		$("#show_on_map").on('click', {context: this}, this.show_on_map );
+		return deferred.promise;
+
+	},
+	render_tags:function(self){
+		var tags_data = function AppViewModel() {
+    		this.response = self.metadata;
+		}
+		console.log(self.metadata);
+
+		//ko.applyBindings(new tags_data());
+		var observableArray = ko.applyBindings(new tags_data());
+		console.log(response);
+		console.log(observableArray);
 	},
 	show_on_map: function(e) {
-		var that = e.data.context;
+		var self = e.data.context;
+		var latLng_point;
 		$.post('/locations',{},function(response){
 			
 			if (response.status === 'OK') {
@@ -99,9 +267,23 @@ var tweetStream = {
 				var current_tweeet;
 				for (var i = 0; i < tweets.length; i++) {
 					current_tweeet = tweets[i];
-					console.log(that);
-					that.google_markers.push(that.create_map_marker(current_tweeet.location.lat,current_tweeet.location.lng));
+					latLng_point = new google.maps.LatLng(current_tweeet.location.lng,current_tweeet.location.lat);
+					//For heat array
+					self.latLng_points.push(latLng_point);
+					
+					//For markers display
+					self.google_markers.push(self.create_map_marker(latLng_point));
 				}
+				 heatmap = new google.maps.visualization.HeatmapLayer({
+    				data: self.latLng_points,
+    				map: self.map
+  				});
+
+				 latLng_point = new google.maps.LatLng(131.044922,-25.363882);
+				 self.google_markers.push(self.create_map_marker(latLng_point));
+				self.latLng_points.push(latLng_point); 
+				heatmap.setData(self.latLng_points);
+				heatmap.setMap(self.map);
 			}
 			//var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
 
@@ -111,10 +293,9 @@ var tweetStream = {
 	//
 	//Move to different object doesn't belong here
 	//
-	create_map_marker: function(lat,lng) {
-		var lat_lng = new google.maps.LatLng(lat,lng);
+	create_map_marker: function(latLng_point) {
 		var marker = new google.maps.Marker({
-      		position: lat_lng,
+      		position: latLng_point,
       		map: this.map
   		});
   		return marker;
@@ -137,6 +318,7 @@ var tweetStream = {
 		});
 	},
 	update_frequency_clicked: function() {
+
 		var tweet_frequency = parseInt($("#tweet_frequency").val());
 		tweet_frequency = tweet_frequency*1000;
 		$.ajax({
@@ -152,20 +334,38 @@ var tweetStream = {
 			},
 			type:'POST'
 		});
+	},
+	load_map: function(){
+		GoogleMapsLoader.KEY = 'AIzaSyDt4-myjrgFVGNxtl1zsXGaHvaCw2k68G4';
+		GoogleMapsLoader.LIBRARIES = ['visualization'];
+		var self = this;
+		GoogleMapsLoader.load(function(google) {
+			var options = {
+				zoom: 3,
+				center: new google.maps.LatLng(33, 35),
+			};
+			self.map = new google.maps.Map(document.getElementById("map"), options);
+			// tweets_div = document.getElementById("tweets");
+			// tweetStream.map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(tweets_div);
+			// controls_div = document.getElementById("controls");
+			// tweetStream.map.controls[google.maps.ControlPosition.TOP_CENTER].push(controls_div);
+		});
 	}
 
 };
 
 
+
 tweetStream.init();
-tweetStream.start_tweet_stream();
+tweetStream.load_map();
+//tweetStream.start_tweet_stream();
 
 
-GoogleMapsLoader.KEY = 'AIzaSyDt4-myjrgFVGNxtl1zsXGaHvaCw2k68G4';
-GoogleMapsLoader.load(function(google) {
-	var options = {
-		zoom: 1,
-		center: new google.maps.LatLng(-34.397, 150.644)
-	};
-	tweetStream.map = new google.maps.Map(document.getElementById("map"), options);
-});
+
+
+
+
+// Sidebar 
+
+    //$('.navbar.easy-sidebar').toggleClass('toggled');
+
