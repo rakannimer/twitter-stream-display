@@ -1,6 +1,8 @@
 body { 
 	margin:0; padding:0; 
 	background-image: url('/app/img/concrete_seamless.png');
+	height: 600px;
+  	overflow-y: auto;
 }
 #map { 
 	position:relative;  
@@ -72,7 +74,27 @@ label {
 .mined-searches-terms {
 	width:100%;
 }
+.small-box {
+	display: block;
+	border: solid 1px #dedede;
+	padding: 5px;
+	border-radius: 9px;
+	padding-top: 13px;
+	padding-bottom: 13px;
+	padding-left: 12px;
+	padding-right: 12px;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
 
+#show_search {
+	cursor: pointer;
+}
 /*.navbar-nav {
 	margin: 0;
 }*/
+.stats-list {
+	padding-left: 16px;
+ 	padding-top: 10px;	
+}
+ 

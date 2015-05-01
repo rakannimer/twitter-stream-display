@@ -4,6 +4,7 @@
   "dependencies": {
     "body-parser": "^1.12.2",
     "bootstrap-material-design": "git://github.com/fezvrasta/bootstrap-material-design.git",
+    "cld": "^2.3.1",
     "express": "^4.12.3",
     "fifo": "git://github.com/RakanNimer/fifo.git",
     "google-maps": "^2.1.1",
@@ -12,6 +13,7 @@
     "html-linkify": "^1.2.0",
     "knockout": "^3.3.0",
     "mongodb": "^2.0.27",
+    "mongojs": "^0.18.2",
     "mongoose": "^4.0.1",
     "node-tweet-stream": "^1.6.0",
     "page": "^1.6.2",
@@ -33,13 +35,16 @@
     "gulp-livereload": "^3.8.0",
     "gulp-minify-css": "^0.3.13",
     "gulp-rename": "^1.2.0",
+    "gulp-scp": "0.0.3",
     "gulp-server-livereload": "^1.2.4",
+    "gulp-ssh": "^0.3.3",
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^1.0.2",
     "jquery": "^2.1.3",
     "mapbox": "^0.1.0",
     "stringify": "^3.1.0",
     "underscore": "^1.8.3",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "yargs": "^3.8.0"
   }
 }

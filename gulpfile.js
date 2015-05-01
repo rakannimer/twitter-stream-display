@@ -1,17 +1,82 @@
-var gulp = require('gulp');
-var source = require('vinyl-source-stream');
-var browserify = require('browserify');
-var jshint    = require('gulp-jshint');
-var concat    = require('gulp-concat');
-var uglify    = require('gulp-uglify');
-var rename    = require('gulp-rename');
-var minifyCSS = require('gulp-minify-css');
-var fs = require('fs');
-var nodemon = require('gulp-nodemon');
-var streamify = require('gulp-streamify');
-var stringify = require('stringify');
-//var exec = require('gulp-exec');
-var exec = require('child_process').exec;
+var gulp = require('gulp'),
+    source = require('vinyl-source-stream'),
+    browserify = require('browserify'),
+    jshint    = require('gulp-jshint'),
+    concat    = require('gulp-concat'),
+    uglify    = require('gulp-uglify'),
+    rename    = require('gulp-rename'),
+    minifyCSS = require('gulp-minify-css'),
+    fs = require('fs'),
+    nodemon = require('gulp-nodemon'),
+    streamify = require('gulp-streamify'),
+    stringify = require('stringify'),
+    //exec = require('gulp-exec'),
+    exec = require('child_process').exec,
+    gulpSCP = require('gulp-scp'),
+  	
+    argv = require('yargs').argv,
+    remoteHost = '188.166.92.41',
+    username = 'root',
+    port = 22,
+    keyPath = '/Users/Apple/.ssh/id_rsa',
+    branch = (argv.branch === undefined)?'master':argv.branch,
+    ssh_config = "Host github.com \n \
+    StrictHostKeyChecking no",
+    gulpSSH = require('gulp-ssh')({
+      ignoreErrors: false,
+      sshConfig: {
+        host: remoteHost,
+        port: port,
+        username: username,
+        privateKey: require('fs').readFileSync(keyPath)
+      }
+    });
+
+
+gulp.task('copy-creds',function(){
+  return gulp.src('server/creds.js')
+        .pipe(gulpSCP({
+            host: remoteHost,
+            user: username,
+            port: port,
+            path: '/var/www/twitter-stream-display/server/'
+    }));
+});
+
+gulp.task('copy-deployment-file', function(){
+    return gulp.src('deploy/build_env.sh')
+        .pipe(gulpSCP({
+            host: remoteHost,
+            user: username,
+            port: port,
+            path: '/'
+    }));
+});
+
+
+gulp.task('build-remote',['copy-deployment-file'], function(){
+  	return gulpSSH
+      .shell(['bash /build_env.sh']).pipe(gulp.dest('logs'));
+});
+
+
+gulp.task('full-deploy', function() {
+  gulp.start('build-remote');
+  gulp.start('deploy');
+});
+
+gulp.task('deploy', function() {
+
+   return gulpSSH
+    .shell([
+      'cd /var/www/twitter-stream-display/',
+      'git checkout '+branch,
+      'git pull origin '+branch + ' && npm install ',
+    ])
+    .pipe(gulp.dest('logs'));
+
+});
+
 
 // Lint Task
 gulp.task('lint', function() {
@@ -42,10 +107,10 @@ gulp.task('scripts', function() {
   
 
     return browserify({entries:['./public/app/js/client.js','./node_modules/toastr/toastr.min.js'], debug:true})
-                .transform(stringify(['.html']))
-                .bundle()
-                .pipe(source('app.min.js'))
-                .pipe(gulp.dest('./public/app/'));
+              .transform(stringify(['.html']))
+               .bundle()
+               .pipe(source('app.min.js'))
+               .pipe(gulp.dest('./public/app/'));
 
 });
 
@@ -56,12 +121,13 @@ gulp.task('watch-all',function() {
   gulp.start('nodemon');
 });
 
+
+
 gulp.task('nodemon',function() {
-  var called = false;
   return nodemon({
       script: './server.js',
       watch: [ "server/*"],
-    })
+    });
 });
 
 gulp.task('db', function() {
@@ -74,8 +140,6 @@ gulp.task('db', function() {
 gulp.task('start', ['scripts', 'css', 'db'], function(){
 
   gulp.start('nodemon');
-  //gulp.src('app')
- //   .pipe();
 });
 
 
@@ -89,3 +153,4 @@ gulp.task('watch-scripts', ['scripts','css'], function() {
 
 // Default Task
 gulp.task('build', ['lint', 'css', 'scripts']);
+

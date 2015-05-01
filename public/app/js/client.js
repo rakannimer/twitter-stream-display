@@ -1,15 +1,17 @@
 
 var tweetDomCreator = require('./tweet-dom-creator.js');
 var $ = require('jquery');
+var _ = require('underscore')
 var page = require('page');
 var GoogleMapsLoader = require('google-maps');
 var toastr = require('toastr');
 var q = require("q");
 var ko = require('knockout');
+var archive_template = require('../templates/archived_data.html');
 
 
 var tweetStream = {
-	
+
 	socket : null,
 	tweets_displayed: 0,
 	markers: [],
@@ -23,27 +25,36 @@ var tweetStream = {
 
 	init: function() {
 		var self = this;
-		this.init_socket();
+		console.log(archive_template);
+		//this.init_socket();
 		this.bind_dom_events();
 		this.getMinedMetaData().then(this.render_tags);
 	},
 	init_socket: function(){
-		this.connect();
-		this.bindTo_socket_events();
+		var connected = this.connect();
+		if (connected) {
+			this.bindTo_socket_events();	
+		}
+		
 	},
 	connect: function(forceNew) {
-		if (io !== undefined ) {
+		if (typeof io !== 'undefined' ) {
 			this.socket = io.connect('http://localhost:8075');
 			this.show_loading('tweets');
+			return true;
+		}
+		else {
+			return false;
 		}
 	},
 	bindTo_socket_events: function(){
 		var self = this;
+
 		this.socket.on("connected", function() {
 			self.hide_loading('tweets');
 			self.logToUser('Connected (ʘ‿ʘ)','success');
 		});
-		
+
 		this.socket.on("disconnected", function() {
 			self.logToUser('Disconnected (一_一) ','error');
 		});
@@ -113,12 +124,15 @@ var tweetStream = {
 
 	bind_dom_events: function() {
 		var self = this;
-		$("#search_button").on('click', this.search_clicked);
+		$("#search_button").on('click', {context: this}, this.search_clicked);
 
 		$("#update_frequency").on('click', {context: this}, this.update_frequency_clicked);
 		$("#stream_toggle").on('click', {context: this}, this.stream_toggle);
 		$("#heatmap_toggle").on('click', {context: this}, this.heatmap_toggle);
 		$("#markers_toggle").on('click', {context: this}, this.markers_toggle);
+		$("#show_search").on('click', {context: this}, function(){
+			$("#search_box").toggle('slow');
+		});
 	},
 
 
@@ -239,23 +253,20 @@ var tweetStream = {
 		var deferred = q.defer();
 		var self = this;
 		$.post('/metadata',{},function(response){
-
-			self.metadata = response.tweets;
+			self.archived_tweets = response.tweets;
+			self.current_search_terms = response.current_search_terms;
 			return deferred.resolve(self);
 		});
 		return deferred.promise;
 
 	},
 	render_tags:function(self){
-		var tags_data = function AppViewModel() {
-    		this.response = self.metadata;
-		}
-		console.log(self.metadata);
+		
+		var compiledTemplate = _.template(archive_template);
+        compiledTemplate = compiledTemplate({archived_tweets: self.archived_tweets});
+        $("#tweet_archive").html(compiledTemplate);
+        $('#current_search_terms').html(self.current_search_terms);
 
-		//ko.applyBindings(new tags_data());
-		var observableArray = ko.applyBindings(new tags_data());
-		console.log(response);
-		console.log(observableArray);
 	},
 	show_on_map: function(e) {
 		var self = e.data.context;
@@ -301,8 +312,13 @@ var tweetStream = {
   		return marker;
 	},
 
-	search_clicked: function() {
+	search_clicked: function(e) {
+		var self = e.data.context;
 		var search_terms = $("#search_terms").val();
+		self.update_search(search_terms);
+	},
+
+	update_search: function(search_terms) {
 		$.ajax({
 			url: '/search',
 			success: function(response) {
@@ -317,6 +333,7 @@ var tweetStream = {
 			type:'POST'
 		});
 	},
+
 	update_frequency_clicked: function() {
 
 		var tweet_frequency = parseInt($("#tweet_frequency").val());
@@ -350,7 +367,8 @@ var tweetStream = {
 			// controls_div = document.getElementById("controls");
 			// tweetStream.map.controls[google.maps.ControlPosition.TOP_CENTER].push(controls_div);
 		});
-	}
+	},
+
 
 };
 
@@ -358,6 +376,14 @@ var tweetStream = {
 
 tweetStream.init();
 tweetStream.load_map();
+
+//This will not be compatible with all browsers change to : http://benalman.com/projects/jquery-hashchange-plugin/ or microrouter
+$(window).on('hashchange',function(e){	
+	var new_page = location.hash;
+	new_page = new_page.split('/');
+	tweetStream.update_search(new_page[2]);
+
+});
 //tweetStream.start_tweet_stream();
 
 

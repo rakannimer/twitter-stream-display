@@ -7,7 +7,9 @@ var express = require('express'),
 	twitter_creds = require('./server/creds.js').twitter,
 	t = new Twitter(twitter_creds),
 	bodyParser = require('body-parser'),
-	db = require('./server/db.js');
+	db = require('./server/db.js'),
+	q = require("q");
+
 
 var app = express(),
 	port = process.env.PORT || 8080,
@@ -24,6 +26,10 @@ app.use(express.static('public/'));
 app.use(bodyParser.urlencoded({ extended: false }));	
 
 db.init();
+//db.getSearchTerms(function(result){
+//	console.log(result);
+//	process.exit();
+//});
 
 var emit_tweet = function() {
 	if (!tweet_queue.isEmpty()) {
@@ -37,31 +43,12 @@ var emit_tweet = function() {
 };
 
 var handle_tweet_received = function(tweet) {
-	if (tweet.coordinates !== null) {
-		if (tweet.coordinates){
-			console.log("Found Location !");
-			var location = {"lat": tweet.coordinates.coordinates[0],"lng": tweet.coordinates.coordinates[1]};
-			tweet_obj = {
-				tweet: tweet,
-				location : location,
-				search_terms : currentSearchTerms
-			};
-
-			db.insertTweet(tweet_obj, function(result){
-				console.log("Inserted into mongo");
-			});
-			console.log("Inserted into mongo");
-		}
-	}
-	else {
-		tweet_obj = {
-			tweet: tweet,
-			location : null,
-			search_terms : currentSearchTerms
-		};
-	}
+	var tweet_model = db.build_tweet_model(currentSearchTerms, tweet);
+	db.insertTweet(tweet_model, function(){
+		console.log("Inserted into mongo");
+	});
 	
-	tweet_queue.push(tweet_obj);
+	tweet_queue.push(tweet_model);
 };
 
 
@@ -69,13 +56,13 @@ currentSearchTerms = 'node.js,js,javascript';
 t.on('tweet', handle_tweet_received);
 
 t.track(currentSearchTerms);
+console.log("Tracking : " + currentSearchTerms);
 //t.location('-180,-90,180,90',true);
 
 var currentInterval = setInterval(emit_tweet,timeBetweenTweets);
 
-// app.get('*', function(req, res){
-// 	res.sendFile(__dirname + '/public/index.html');
-// });
+
+
 
 app.post('/update_frequency', function(req, res) {
 	console.log("updating frequency");
@@ -111,7 +98,8 @@ app.post('/metadata', function(req, res) {
 	db.getSearchTerms(function(result){
 		response = {
 			'status' : 'OK',
-		    'tweets' : result 
+		    'tweets' : result,
+		    'current_search_terms': currentSearchTerms 
 		};
 		res.send(response);
 	});
@@ -125,7 +113,7 @@ app.listen(port);
 console.log("Application is running on http://localhost:8080")
 
 io.sockets.on('connection',function(socket){
-	console.log('User connected  ');
+	console.log('User connected ');
 	socket.on('start', function(){
 		console.log("Client is ready to start receiving events");
 	});
