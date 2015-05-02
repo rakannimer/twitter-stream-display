@@ -2,12 +2,12 @@
 <div> 
 	<div class="small-box col-sm-offset-1 col-sm-3">	
 		<div class="mined-searches-terms" style="" >
-			<strong> <a href="#/search_terms/<%= archived_tweets[i]._id %>"> <%= archived_tweets[i]._id %> </a> </strong> 
+			<strong> <a href="#/search_terms/<%= archived_tweets[i].search_terms %>"> <%= archived_tweets[i].search_terms %> </a> </strong> 
 		</div>
 		<ul class="stats-list">
-			<li class="stats-list-item"> Total  :  <%= archived_tweets[i].value.count %> </li>
-			<li class="stats-list-item"> Geo-Tagged  : <%= archived_tweets[i].value.geo_count %>  </li>
-			<li class="stats-list-item"> Non-Geotagged  : <%= archived_tweets[i].value.non_geo_count %> </li>
+			<li class="stats-list-item"> Total  :  <%= archived_tweets[i].count %> </li>
+			<li class="stats-list-item"> Geo-Tagged  : <%= archived_tweets[i].geo_count %>  </li>
+			<li class="stats-list-item"> Non-Geotagged  : <%= archived_tweets[i].non_geo_count %> </li>
 		</ul>
 	</div>
 </div>

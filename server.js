@@ -8,10 +8,9 @@ var express = require('express'),
 	t = new Twitter(twitter_creds),
 	bodyParser = require('body-parser'),
 	db = require('./server/db.js'),
-	q = require("q");
-
-
-var app = express(),
+	q = require("q"),
+ 	currentSearchTerms = 'node.js,js,javascript',
+	app = express(),
 	port = process.env.PORT || 8080,
 	users = [],
 	currentSearchTerms = '',
@@ -65,7 +64,7 @@ var currentInterval = setInterval(emit_tweet,timeBetweenTweets);
 
 
 app.post('/update_frequency', function(req, res) {
-	console.log("updating frequency");
+	console.log("POST: update_frequency");
 	var new_interval = parseInt(req.body.frequency);
 	clearInterval(currentInterval);
 	currentInterval = setInterval(emit_tweet,new_interval);
@@ -73,6 +72,7 @@ app.post('/update_frequency', function(req, res) {
 });
 
 app.post('/search', function(req, res) {
+	console.log("POST: search");
 	var search_terms = req.body.search_terms;
 	t.untrack(currentSearchTerms);	
 	currentSearchTerms = search_terms;
@@ -82,8 +82,9 @@ app.post('/search', function(req, res) {
 });
 
 app.post('/locations', function(req, res) {
-	console.log("LOCATION LOCATION LOCATION");
+	console.log("POST: locations");
 	db.getTweetLocations(currentSearchTerms, function(tweets) {
+		
 		response = {
 			'status' : 'OK',
 		    'tweets' : tweets 
@@ -94,7 +95,7 @@ app.post('/locations', function(req, res) {
 
 
 app.post('/metadata', function(req, res) {
-	console.log("Requesting metadata");
+	console.log("POST: metadata");
 	db.getSearchTerms(function(result){
 		response = {
 			'status' : 'OK',
@@ -113,25 +114,18 @@ app.listen(port);
 console.log("Application is running on http://localhost:8080")
 
 io.sockets.on('connection',function(socket){
-	console.log('User connected ');
+	console.log("SOCKET:RECEIVED connection");
 	socket.on('start', function(){
+		console.log("SOCKET:RECEIVED start")
 		console.log("Client is ready to start receiving events");
 	});
 
 	socket.emit('connected', function(){
-		console.log('Server ready to start streaming data');
+		console.log("SOCKET:EMIT connected")
 	});
 
 	socket.on('disconnect', function(o){
-		console.log('User disconnected : ');
-		console.log(o);
+		console.log("SOCKET:RECEIVED disconnect",o)
 	});
 });
 
-var stopStream = function() {
-	socket.disconnect();
-};
-
-var restartStream = function() {
-	socket.connect();
-};

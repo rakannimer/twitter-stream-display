@@ -8,7 +8,7 @@ var toastr = require('toastr');
 var q = require("q");
 var ko = require('knockout');
 var archive_template = require('../templates/archived_data.html');
-
+var creds = require('./creds.js');
 
 var tweetStream = {
 
@@ -264,6 +264,7 @@ var tweetStream = {
 		
 		var compiledTemplate = _.template(archive_template);
         compiledTemplate = compiledTemplate({archived_tweets: self.archived_tweets});
+		console.log(self.archived_tweets);
         $("#tweet_archive").html(compiledTemplate);
         $('#current_search_terms').html(self.current_search_terms);
 
@@ -285,7 +286,7 @@ var tweetStream = {
 					//For markers display
 					self.google_markers.push(self.create_map_marker(latLng_point));
 				}
-				 heatmap = new google.maps.visualization.HeatmapLayer({
+				var heatmap = new google.maps.visualization.HeatmapLayer({
     				data: self.latLng_points,
     				map: self.map
   				});
@@ -353,7 +354,7 @@ var tweetStream = {
 		});
 	},
 	load_map: function(){
-		GoogleMapsLoader.KEY = 'AIzaSyDt4-myjrgFVGNxtl1zsXGaHvaCw2k68G4';
+		GoogleMapsLoader.KEY = creds.google_maps;
 		GoogleMapsLoader.LIBRARIES = ['visualization'];
 		var self = this;
 		GoogleMapsLoader.load(function(google) {
