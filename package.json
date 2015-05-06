@@ -5,6 +5,7 @@
     "body-parser": "^1.12.2",
     "bootstrap-material-design": "git://github.com/fezvrasta/bootstrap-material-design.git",
     "cld": "^2.3.1",
+    "codemirror": "^5.2.0",
     "express": "^4.12.3",
     "fifo": "git://github.com/RakanNimer/fifo.git",
     "google-maps": "^2.1.1",
