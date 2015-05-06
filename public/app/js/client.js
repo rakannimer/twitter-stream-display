@@ -10,7 +10,6 @@ var ko = require('knockout');
 var archive_template = require('../templates/archived_data.html');
 var creds = require('./creds.js');
 var codemirror = require('codemirror');
-var SimpleSlider = require('simple-slider');
 require('magnific-popup');
 require('codemirror/mode/r/r');
 

@@ -20,16 +20,26 @@ var gulp = require('gulp'),
     remoteHost = '188.226.154.63',
     username = 'root',
     port = 22,
-    branch = (argv.branch === undefined)?'master':argv.branch,
+   
+    keyPath = '/Users/Apple/.ssh/id_rsa',
+    privateKey = '';
+    try {
+      privateKey = require('fs').readFileSync(keyPath)
+    }
+    catch(e) {
+      console.log("!!!!!!!!! \n KEY NOT FOUND.CHANGE IT TO LOCAL KEY IF YOU WANT TO USE SSH FUNCTIONALITY ! \n !!!!!!!!!!!!!!");
+    }
+    var branch = (argv.branch === undefined)?'master':argv.branch;
     
-    ssh_config = "Host github.com \n \
-    StrictHostKeyChecking no",
-    gulpSSH = require('gulp-ssh')({
+    var ssh_config = "Host github.com \n \
+    StrictHostKeyChecking no";
+    var gulpSSH = require('gulp-ssh')({
       ignoreErrors: false,
       sshConfig: {
         host: remoteHost,
         port: port,
         username: username,
+       privateKey: privateKey
       }
     });
 
