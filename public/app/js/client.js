@@ -9,6 +9,24 @@ var q = require("q");
 var ko = require('knockout');
 var archive_template = require('../templates/archived_data.html');
 var creds = require('./creds.js');
+var codemirror = require('codemirror');
+var SimpleSlider = require('simple-slider');
+require('magnific-popup');
+require('codemirror/mode/r/r');
+
+
+$('.gallery-item').magnificPopup({
+  type: 'image',
+  gallery:{
+    enabled:true
+  }
+});
+
+//var slider = new SimpleSlider( document.getElementById('myslider'), {
+//    autoPlay:false,
+//    transitionTime:1,
+//    transitionDelay:3.5
+//  } );
 
 var tweetStream = {
 
@@ -24,8 +42,6 @@ var tweetStream = {
 	metadata:null,
 
 	init: function() {
-		var self = this;
-		console.log(archive_template);
 		//this.init_socket();
 		this.bind_dom_events();
 		this.getMinedMetaData().then(this.render_tags);
@@ -371,20 +387,122 @@ var tweetStream = {
 	},
 
 
+
 };
 
 
 
-tweetStream.init();
-tweetStream.load_map();
+
+
+
+var code_editor = {
+	init: function() {
+		this.bind_dom_events();
+	},
+	load_editor: function(){
+		$("#editor").show();	
+		this.editor = codemirror.fromTextArea($("#code_editor").get(0), {
+			lineNumbers: true,
+			mode: "r",
+		});
+		
+		this.editor.setOption("extraKeys", {
+		  Tab: function(cm) {
+		    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+		    cm.replaceSelection(spaces);
+		  }
+		});
+	},
+
+	bind_dom_events: function() {
+		$("#compile_r").on('click', {context: this}, this.compile_r_clicked);
+	},
+	compile_r_clicked: function(e) {
+		var self = e.data.context;
+		var code = self.editor.getValue();
+		$.post('/compile_code',{code: code},function(response) {
+			var output = response.message.output;
+			alert(output);
+			$("#code_result").html(output);
+			if (response.status === 'ok') {
+				
+				if (response.message.graphs.length > 0) {
+					$("#graphs_result").html("");
+					for (var i =0; i < response.message.graphs.length; i++) {
+						$("#graphs_result").append('<a class="gallery-item"  href="'+response.message.graphs[i]+'"><img style="width:200px;height:100px;" src="'+response.message.graphs[i]+'" /></a>');
+					}
+					$('.gallery-item').magnificPopup({
+					  type: 'image',
+					  gallery:{
+					    enabled:true
+					  }
+					});
+				}
+			}
+			else {
+				
+			}
+			
+		});
+		
+	}
+};
 
 //This will not be compatible with all browsers change to : http://benalman.com/projects/jquery-hashchange-plugin/ or microrouter
-$(window).on('hashchange',function(e){	
-	var new_page = location.hash;
-	new_page = new_page.split('/');
-	tweetStream.update_search(new_page[2]);
 
-});
+var router = {
+	page : 'home',
+	init : function() {
+		var current_page = location.hash;
+		var current_page_chunks = current_page.split('/');
+		this.listen_to_hashchange();
+		this.route(current_page_chunks);
+	},
+	listen_to_hashchange: function() {
+		var self= this;
+		$(window).on('hashchange',function(e){	
+			var new_page = location.hash;
+			 
+			var new_page_chunks = new_page.split('/');
+			self.route(new_page_chunks); 
+			return;
+		});
+	},
+	route: function( hashes) {
+		var self = this;
+
+				
+		if (hashes.length < 2 ) {
+			return;
+		}
+		switch(hashes[1]) {
+			case '':
+			case 'search_terms':
+				if (self.page !== 'home') {
+					$("#code").hide();
+					$("#home").show();
+					self.page = 'home';
+				}
+				if (typeof hashes[2] != 'undefined') {
+					tweetStream.update_search(hashes[2]);	
+				}
+				break;
+			case 'code':
+				if (self.page !== 'code') {
+					code_editor.load_editor();
+					$("#app_container").children().hide();
+					$("#code").show();
+					self.page = 'code';
+				}
+				break;
+		}
+	} 
+}
+
+router.init();
+code_editor.init();
+tweetStream.init();
+tweetStream.load_map();
 //tweetStream.start_tweet_stream();
 
 

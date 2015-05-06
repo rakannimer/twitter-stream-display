@@ -17,8 +17,9 @@ var express = require('express'),
 	tweet,
 	data,
 	tweet_obj,
-	timeBetweenTweets = 200;
-
+	timeBetweenTweets = 200,
+	exec = require('child_process').exec,
+	uuid= require('node-uuid');
 
 
 app.use(express.static('public/'));
@@ -61,6 +62,84 @@ console.log("Tracking : " + currentSearchTerms);
 var currentInterval = setInterval(emit_tweet,timeBetweenTweets);
 
 
+app.post('/compile_code', function(req, res) {
+	console.log("POST: compile_code");
+	var folderName = 'r-twitter-'+uuid.v1();
+	var folderPath = './public/user-code/'+folderName;
+	var publicPath = '/user-code/'+folderName;
+	var codeFilePath = folderPath+'/code.r';
+	console.log(codeFilePath);
+	//var resultGraph = './server/R/'+fileName+'.jpg';
+	var code = "#!/usr/bin/env Rscript \n setwd('"+folderPath+"')  \n  ";
+	code += req.body.code;
+	var response = {};
+	
+	fs.mkdir(folderPath,function(params) {
+		fs.writeFile(codeFilePath, code, function(err){
+		if(err) {
+			response.status = 'error';
+			response.message = err;
+	        return console.log(err);
+	    }
+		
+	    console.log("The file was saved:");
+		console.log("File path :", codeFilePath);
+		console.log("File Content :", code);
+		exec('Rscript '+codeFilePath, function(error, stdout, stderr) {
+			console.log("Done executing Rscript");
+			
+			if (error !== null) {
+				response.status  = 'error';
+				
+				response.message = {output: stderr};
+				res.send(response);
+				return;
+				//Refactor !
+			}
+			response.status = 'ok';
+			
+			console.log('error : ', error);
+			console.log('stderr : ', stderr);
+			console.log('stdout : ', stdout);
+			var graphPaths = [];
+			fs.readdir(folderPath, function(err, files) {
+				if (err !== null) {
+					response.status = 'error';
+					response.message = 'Error reading directory';
+					console.log("Error reading from directory", err);
+				}
+				
+				for (var i = 0; i < files.length; i++) {
+					if (files[i].indexOf(".png") > -1){
+						graphPaths.push(publicPath+'/'+files[i]);
+						console.log("Image Found");
+					}
+				}
+				response.message = {
+					graphs:	graphPaths,
+					output: stdout
+				};
+				res.send(response);
+				//Refactor !
+			});
+//			exec('ls | grep .png', function(error, stdout, stderr) {
+//				console.log('error : ', error);
+//				console.log('stderr : ', stderr);
+//				console.log('stdout : ', stdout);
+//			});
+			/*
+				options(device = function() png(width = 960))
+				cars <- c(1, 3, 6, 4, 9)
+				plot(cars)
+				cars2 <- c(1, 2, 3, 4, 5)
+				plot(cars2)
+			*/
+		});
+	});	
+	})
+		
+
+});
 
 
 app.post('/update_frequency', function(req, res) {
@@ -95,7 +174,7 @@ app.post('/locations', function(req, res) {
 
 
 app.post('/metadata', function(req, res) {
-	console.log("POST: metadata");
+	console.log(" POST: metadata");
 	db.getSearchTerms(function(result){
 		response = {
 			'status' : 'OK',

@@ -71,11 +71,6 @@ gulp.task('build-remote',['copy-deployment-file'], function(){
       .shell(['bash /build_env.sh']).pipe(gulp.dest('logs'));
 });
 
-
-gulp.task('full-deploy', ['build-remote'], function() {
-  gulp.start('deploy');
-});
-
 gulp.task('deploy', function() {
 
    return gulpSSH
@@ -99,7 +94,7 @@ gulp.task('lint', function() {
 
 // Compile Our CSS
 gulp.task('css', function() {
-  return gulp.src([ './node_modules/bootstrap/dist/css/bootstrap.css','./node_modules/mapbox.js/theme/style.css','./node_modules/toastr/toastr.css','./public/app/css/*.css'])
+  return gulp.src([ './node_modules/bootstrap/dist/css/bootstrap.css','./node_modules/codemirror/lib/codemirror.css', './node_modules/mapbox.js/theme/style.css','./node_modules/magnific-popup/dist/magnific-popup.css' ,'./node_modules/toastr/toastr.css','./public/app/css/*.css'])
     .pipe(concat('app.min.css'))
     .pipe(minifyCSS())
     .pipe(gulp.dest('./public/app/'));
@@ -115,6 +110,11 @@ gulp.task('scripts', function() {
                 .bundle()
                 .pipe(source('toastr.min.js'))
                 .pipe(gulp.dest('./node_modules/toastr/'));
+
+//  browserify({entries:['./public/app/js/libs.js'], debug:true})
+//                .bundle()
+//                .pipe(source('lightbox.min.js'))
+//                .pipe(gulp.dest('./node_modules/lightbox/js/'));
   
 
     return browserify({entries:['./public/app/js/client.js','./node_modules/toastr/toastr.min.js'], debug:true})

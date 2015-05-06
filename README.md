@@ -83,11 +83,6 @@ Builds an environment on top of an empty Ubuntu Machine ready to start listening
 After committing your changes and pushing them to the repo, deploy the new code on the server on the selected branch.
 if the branch argument is not passed master will be used.
 
-```
-	gulp full-deploy
-```
-
-```gulp build-remote ``` + ``` gulp-deploy ```
 
 
 ## Deployment
@@ -109,7 +104,7 @@ Create an ubuntu 14.04 machine get it's ip and in gulpfile.js set your hostname 
 Then run 
 
 ```
-	gulp full-deploy
+	gulp build-remote
 ```
 Go make a cup of coffee. <br />
 Come back and you should have an instance running.
@@ -127,3 +122,6 @@ Requirements :
 Mongo should be installed on your system. [How to install mongo on Ubuntu](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/)
 
 
+### Credits
+
+Thanks To [Keen.io (an excellent analytics company)](http://keen.io) for the Bootstrap theme.

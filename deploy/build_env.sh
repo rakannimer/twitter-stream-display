@@ -5,6 +5,7 @@ apt-get -y upgrade
 apt-get install -y git 
 apt-get install -y nodejs
 apt-get install -y npm
+apt-get install r-base
 ln -s  /usr/bin/nodejs  /usr/bin/node
 npm install -g pm2
 npm install -g gulp
@@ -16,4 +17,6 @@ apt-get install -y mongodb-org
 ## Mongo installed
 mkdir -p /var/www/
 cd /var/www/ && git clone https://github.com/RakanNimer/twitter-stream-display 
-cd twitter-stream-display && npm install 
+cd twitter-stream-display 
+git pull origin master
+npm install && gulp start-prod
