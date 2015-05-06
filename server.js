@@ -70,7 +70,7 @@ app.post('/compile_code', function(req, res) {
 	var codeFilePath = folderPath+'/code.r';
 	console.log(codeFilePath);
 	//var resultGraph = './server/R/'+fileName+'.jpg';
-	var code = "#!/usr/bin/env Rscript \n setwd('"+folderPath+"')  \n  ";
+	var code = "#!/usr/bin/env Rscript \n setwd('"+folderPath+"')  \n   options(device = function() png(width = 960)) \n ";
 	code += req.body.code;
 	var response = {};
 	
