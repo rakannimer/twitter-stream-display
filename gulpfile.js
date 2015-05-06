@@ -20,7 +20,6 @@ var gulp = require('gulp'),
     remoteHost = '188.226.154.63',
     username = 'root',
     port = 22,
-    keyPath = '/Users/Apple/.ssh/id_rsa',
     branch = (argv.branch === undefined)?'master':argv.branch,
     
     ssh_config = "Host github.com \n \
@@ -31,7 +30,6 @@ var gulp = require('gulp'),
         host: remoteHost,
         port: port,
         username: username,
-        privateKey: require('fs').readFileSync(keyPath)
       }
     });
 
@@ -78,7 +76,8 @@ gulp.task('deploy',['copy-creds'], function() {
       'cd /var/www/twitter-stream-display/',
       'git checkout '+branch,
       'git pull origin '+branch + ' && npm install ',
-      'pm2 start -x server.js' 
+      'pm2 restart -x server.js',
+      'gulp build'
     ])
     .pipe(gulp.dest('logs'));
 
