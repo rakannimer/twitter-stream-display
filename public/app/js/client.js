@@ -422,7 +422,6 @@ var code_editor = {
 		var code = self.editor.getValue();
 		$.post('/compile_code',{code: code},function(response) {
 			var output = response.message.output;
-			alert(output);
 			$("#code_result").html(output);
 			if (response.status === 'ok') {
 				

@@ -71,14 +71,14 @@ gulp.task('build-remote',['copy-deployment-file'], function(){
       .shell(['bash /build_env.sh']).pipe(gulp.dest('logs'));
 });
 
-gulp.task('deploy', function() {
+gulp.task('deploy',['copy-creds'], function() {
 
    return gulpSSH
     .shell([
       'cd /var/www/twitter-stream-display/',
       'git checkout '+branch,
       'git pull origin '+branch + ' && npm install ',
-      'pm2 start -x ./server.js' 
+      'pm2 start -x server.js' 
     ])
     .pipe(gulp.dest('logs'));
 

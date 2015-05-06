@@ -5,7 +5,7 @@ apt-get -y upgrade
 apt-get install -y git 
 apt-get install -y nodejs
 apt-get install -y npm
-apt-get install r-base
+apt-get install -y r-base
 ln -s  /usr/bin/nodejs  /usr/bin/node
 npm install -g pm2
 npm install -g gulp
