@@ -200,13 +200,13 @@
   <div class="container-fluid" id="app_container">
 	<div class="row" id="code" style="display:none">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-6">
 				<div class="chart-wrapper">
 					<div class="chart-title">
 						Let's write some R
 					</div>
 		      		<div class="chart-stage">
-						<div id="editor" style="display:none" >
+						<div id="editor"  >
 							<textarea id="code_editor"></textarea>
 						</div>	
 					</div>
@@ -215,17 +215,21 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row">
+		
 			<div class="col-sm-6">
-				<div class="chart-wrapper">
+				<div class="chart-wrapper" id="console_output">
 					<div class="chart-title">
 						Console Output
 					</div>
 		      		<div class="chart-stage">
-						  <div id="code_result">
+						  <!--
+						  <pre id="code_result">
 								  
-						  </div>
+						  </pre>
+						  -->
+						  <div id="console_editor_wrapper" style="" >
+							<textarea id="console_editor"></textarea>
+						</div>	
 					</div>
 					<div class="chart-notes">
 						
@@ -233,20 +237,23 @@
 				</div>
 			</div>
 			<div class="col-sm-6">
-				<div class="chart-wrapper">
-					<div class="chart-title">
-						Graphs
-					</div>
-		      		<div class="chart-stage">
-						  <div id="graphs_result">
-								<a class="gallery-item" href="http://placekitten.com/g/612/612"><img src="http://placekitten.com/g/112/112" /></a>
-						  </div>
-					</div>
-					<div class="chart-notes">
-						
+					<div class="chart-wrapper" id="graph_output">
+						<div class="chart-title">
+							Graphs
+						</div>
+			      		<div class="chart-stage">
+							  <div id="graphs_result">
+									<a class="gallery-item" href="http://placekitten.com/g/612/612"><img src="http://placekitten.com/g/112/112" /></a>
+							  </div>
+						</div>
+						<div class="chart-notes">
+							
+						</div>
 					</div>
 				</div>
-			</div>
+		</div>
+		<div class="row">
+			
 		</div>
 	</div>
 	

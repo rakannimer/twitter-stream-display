@@ -1,7 +1,3 @@
 .CodeMirror {
 	width: 100%;	  
 }
-
-.CodeMirror pre>span {
-  padding-left: 35px;
-}

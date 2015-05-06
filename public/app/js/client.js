@@ -399,10 +399,11 @@ var code_editor = {
 		this.bind_dom_events();
 	},
 	load_editor: function(){
-		$("#editor").show();	
 		this.editor = codemirror.fromTextArea($("#code_editor").get(0), {
 			lineNumbers: true,
 			mode: "r",
+			showCursorWhenSelecting: true,
+			autofocus: true
 		});
 		
 		this.editor.setOption("extraKeys", {
@@ -413,15 +414,48 @@ var code_editor = {
 		});
 	},
 
+	load_console: function() {
+		this.console = codemirror.fromTextArea($("#console_editor").get(0), {
+			mode: "r",
+			theme: "blackboard",
+			//showCursorWhenSelecting: true,
+			//readOnly: true,
+		});
+		
+		this.console.setOption("extraKeys", {
+		  Tab: function(cm) {
+		    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+		    cm.replaceSelection(spaces);
+		  },
+		  "Cmd-S": function() {
+			  alert("ASD");
+		  }
+		});
+		this.console.setValue("Ready for your commands \n");
+	},
+	
+	clear_console: function() {
+			
+	},
+
+	write_to_console: function(message) {
+		this.console.setValue(this.console.getValue()+message+"\n");
+	},
+
 	bind_dom_events: function() {
 		$("#compile_r").on('click', {context: this}, this.compile_r_clicked);
+	},
+	refresh_code_mirror: function() {
+		this.editor.refresh();
+		this.console.refresh();	
 	},
 	compile_r_clicked: function(e) {
 		var self = e.data.context;
 		var code = self.editor.getValue();
 		$.post('/compile_code',{code: code},function(response) {
 			var output = response.message.output;
-			$("#code_result").html(output);
+			//$("#code_result").html(output);
+			self.write_to_console(output);
 			if (response.status === 'ok') {
 				
 				if (response.message.graphs.length > 0) {
@@ -488,8 +522,11 @@ var router = {
 			case 'code':
 				if (self.page !== 'code') {
 					code_editor.load_editor();
+					code_editor.load_console();
 					$("#app_container").children().hide();
 					$("#code").show();
+					// http://jtmorris.net/2013/06/codemirror-editor-not-displaying-default-value/
+					code_editor.refresh_code_mirror()
 					self.page = 'code';
 				}
 				break;
@@ -499,6 +536,7 @@ var router = {
 
 router.init();
 code_editor.init();
+
 tweetStream.init();
 tweetStream.load_map();
 //tweetStream.start_tweet_stream();

@@ -27,7 +27,7 @@ var gulp = require('gulp'),
       privateKey = require('fs').readFileSync(keyPath)
     }
     catch(e) {
-      console.log("!!!!!!!!! \n KEY NOT FOUND.CHANGE IT TO LOCAL KEY IF YOU WANT TO USE SSH FUNCTIONALITY ! \n !!!!!!!!!!!!!!");
+      console.log("!!!!!!!!! \n KEY NOT FOUND.CHANGE IT TO LOCAL KEY IF YOU WANT TO USE SSH FUNCTIONALITY ! \n !!!!!!!!!");
     }
     var branch = (argv.branch === undefined)?'master':argv.branch;
     
@@ -103,9 +103,11 @@ gulp.task('lint', function() {
 
 // Compile Our CSS
 gulp.task('css', function() {
-  return gulp.src([ './node_modules/bootstrap/dist/css/bootstrap.css','./node_modules/codemirror/lib/codemirror.css', './node_modules/mapbox.js/theme/style.css','./node_modules/magnific-popup/dist/magnific-popup.css' ,'./node_modules/toastr/toastr.css','./public/app/css/*.css'])
+  return gulp.src([ './node_modules/bootstrap/dist/css/bootstrap.css','./node_modules/codemirror/lib/codemirror.css', './node_modules/magnific-popup/dist/magnific-popup.css' ,'./node_modules/toastr/toastr.css',
+  './node_modules/codemirror/theme/blackboard.css',
+  './public/app/css/*.css'])
     .pipe(concat('app.min.css'))
-    .pipe(minifyCSS())
+    //.pipe(minifyCSS())
     .pipe(gulp.dest('./public/app/'));
 });
 

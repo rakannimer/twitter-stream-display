@@ -6,6 +6,14 @@ apt-get install -y git
 apt-get install -y nodejs
 apt-get install -y npm
 apt-get install -y r-base
+echo "local({
+  r <- getOption(\"repos\")
+  r[\"CRAN\"] <- \"http://cran.cnr.berkeley.edu/\"
+  options(repos = r)
+})" > /etc/R/Rprofile.site
+apt-get -y build-dep libcurl4-gnutls-dev
+#for R devtools
+apt-get -y install libcurl4-gnutls-dev
 ln -s  /usr/bin/nodejs  /usr/bin/node
 npm install -g pm2
 npm install -g gulp
