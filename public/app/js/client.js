@@ -12,7 +12,7 @@ var creds = require('./creds.js');
 var codemirror = require('codemirror');
 require('magnific-popup');
 require('codemirror/mode/r/r');
-
+var stored_data = require('./stored_data');
 
 $('.gallery-item').magnificPopup({
   type: 'image',
@@ -21,6 +21,9 @@ $('.gallery-item').magnificPopup({
   }
 });
 
+toastr.options.closeButton = true;
+toastr.options.extendedTimeOut = 60;
+toastr.options.progressBar = true; 
 //var slider = new SimpleSlider( document.getElementById('myslider'), {
 //    autoPlay:false,
 //    transitionTime:1,
@@ -399,6 +402,7 @@ var code_editor = {
 		this.bind_dom_events();
 	},
 	load_editor: function(){
+		var self = this;
 		this.editor = codemirror.fromTextArea($("#code_editor").get(0), {
 			lineNumbers: true,
 			mode: "r",
@@ -410,25 +414,31 @@ var code_editor = {
 		  Tab: function(cm) {
 		    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
 		    cm.replaceSelection(spaces);
+		  },
+		  "Cmd-S": function() {
+			  storage.setItem("saved_code",self.editor.getValue());
+			  toastr['success']("Code Saved");
 		  }
 		});
+		var stored_code = storage.getItem("saved_code");
+		if(typeof stored_code !== 'undefined') {
+			//this.editor.setValue(stored_code);	
+		}
+		this.editor.setValue(stored_data.r_examples.temp);
+		this.editor.setCursor(this.editor.lineCount(), 0);
 	},
 
 	load_console: function() {
 		this.console = codemirror.fromTextArea($("#console_editor").get(0), {
 			mode: "r",
 			theme: "blackboard",
-			//showCursorWhenSelecting: true,
-			//readOnly: true,
+			readOnly: true
 		});
 		
 		this.console.setOption("extraKeys", {
 		  Tab: function(cm) {
 		    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
 		    cm.replaceSelection(spaces);
-		  },
-		  "Cmd-S": function() {
-			  alert("ASD");
 		  }
 		});
 		this.console.setValue("Ready for your commands \n");
@@ -440,24 +450,32 @@ var code_editor = {
 
 	write_to_console: function(message) {
 		this.console.setValue(this.console.getValue()+message+"\n");
+		this.console.setCursor(this.console.lineCount(), 0);
 	},
 
 	bind_dom_events: function() {
 		$("#compile_r").on('click', {context: this}, this.compile_r_clicked);
+		$("#clear_console").on('click', {context: this}, this.clear_console_clicked);
 	},
 	refresh_code_mirror: function() {
 		this.editor.refresh();
 		this.console.refresh();	
 	},
+
+	clear_console_clicked: function(e) {
+		var self = e.data.context;
+		self.console.setValue("");
+	},
 	compile_r_clicked: function(e) {
 		var self = e.data.context;
 		var code = self.editor.getValue();
+		toastr['info']('Compiling Code');
 		$.post('/compile_code',{code: code},function(response) {
 			var output = response.message.output;
 			//$("#code_result").html(output);
 			self.write_to_console(output);
 			if (response.status === 'ok') {
-				
+				toastr['success']('Code compiled without errors');
 				if (response.message.graphs.length > 0) {
 					$("#graphs_result").html("");
 					for (var i =0; i < response.message.graphs.length; i++) {
@@ -472,7 +490,7 @@ var code_editor = {
 				}
 			}
 			else {
-				
+				toastr['error']('Something happened');
 			}
 			
 		});
@@ -532,6 +550,26 @@ var router = {
 				break;
 		}
 	} 
+}
+
+
+var storage = {
+	init: function() {
+		
+	},
+	supports_html5_storage: function() {
+		 try {
+		    return 'localStorage' in window && window['localStorage'] !== null;
+		  } catch (e) {
+		    return false;
+  		}
+	},
+	setItem: function(key,data) {
+		localStorage.setItem(key,data);
+	},
+	getItem: function(key) {
+		return localStorage[key];
+	}
 }
 
 router.init();
