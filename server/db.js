@@ -40,8 +40,8 @@ var db_instance = null;
 var db = {
 	url : 'mongodb://localhost:27017/tweet_streams',
 	init: function(callback) {
-		that = this;
-		db_instance =  mongojs(this.url,['tweets','geotagged_count']);
+		db_instance =  mongojs(this.url,['tweets','geotagged_count','sessions']);
+		return this;
 		// mongojs.connect(this.url, function(err, db) {
 		// 	console.log("Connected to mongo");
 		// 	assert.equal(null, err);
@@ -229,6 +229,35 @@ var db = {
 		});
 		*/
 		
+		return deferred.promise;
+	},
+	get_current_search_terms: function(){
+		var deferred = q.defer();
+		var sessions = db_instance.collection("sessions");
+		sessions.find({user_id:1}).toArray(function(err, docs) {
+			if (docs.length > 0) {
+				console.log("Current search terms :",docs[0].current_search_terms);
+				return deferred.resolve(docs[0]);	
+			}
+			return false;
+		});
+		return deferred.promise;
+	},
+	update_current_search_terms: function(user_id, search_terms) {
+		var deferred = q.defer();
+		db_instance.collection("sessions").findAndModify({
+		    query: { user_id: user_id },
+		    update: { $set: { current_search_terms: search_terms } },
+		    new: true
+		}, function(err, doc, lastErrorObject) {
+		    if (err === null) {
+				return deferred.resolve(err);	
+			}
+			else {
+				return deferred.resolve(doc);
+			}
+			
+		});
 		return deferred.promise;
 	}
 

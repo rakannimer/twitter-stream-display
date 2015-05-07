@@ -27,6 +27,7 @@ cat(mongo.count(mongo, namespace, mongo.bson.empty()))\
 query <- dbGetQuery(mg1, 'tweets','{}',0,5); \n\
 data1 <- query[c('language','search_terms')] \n\
 print(data1)",
+	
 		volcano:
 "persp(volcano, expand = 0.5)"
 	}

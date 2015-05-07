@@ -1,5 +1,5 @@
 var express = require('express'),
-	io = require('socket.io')(8075),
+	io = require('socket.io')(8076),
 	fs = require('fs'),
 	assert = require('assert'),
 	tweet_queue = require('fifo')(),
@@ -7,10 +7,10 @@ var express = require('express'),
 	twitter_creds = require('./server/creds.js').twitter,
 	t = new Twitter(twitter_creds),
 	bodyParser = require('body-parser'),
-	db = require('./server/db.js'),
+	db = require('./server/db.js').init(),
 	q = require("q"),
- 	currentSearchTerms = 'node.js,js,javascript',
 	app = express(),
+	router = express.Router(),
 	port = process.env.PORT || 8080,
 	users = [],
 	currentSearchTerms = '',
@@ -19,47 +19,44 @@ var express = require('express'),
 	tweet_obj,
 	timeBetweenTweets = 200,
 	exec = require('child_process').exec,
-	uuid= require('node-uuid');
+	uuid= require('node-uuid'),
+	r_helper = require('./server/r_helper.js'),
+	twitter_dashboard = require('./server/twitter_dashboard.js');
 
 
 app.use(express.static('public/'));
 app.use(bodyParser.urlencoded({ extended: false }));	
 
-db.init();
-//db.getSearchTerms(function(result){
-//	console.log(result);
-//	process.exit();
-//});
+router.post('/compile_code',function(req, res){  });
 
-var emit_tweet = function() {
-	if (!tweet_queue.isEmpty()) {
-		tweet = tweet_queue.shift();
-		data = {
-			'status' : 'OK',
-			'tweet': tweet
-		};
-		io.emit('server:tweet_received', JSON.stringify(data));
-	}
-};
+router.post('/frequency', function(req, res) { 
+	console.log("POST: frequency");
+	var interval = parseInt(req.body.frequency);
+	twitter_dashboard.update_frequency(interval);
+	res.send({status:'OK', message:'FREQUENCY_UPDATED'});
+});
 
-var handle_tweet_received = function(tweet) {
-	var tweet_model = db.build_tweet_model(currentSearchTerms, tweet);
-	db.insertTweet(tweet_model, function(){
-		console.log("Inserted into mongo");
+router.post('/search', function(req, res){ 
+	console.log("POST: search");
+	var search_terms = req.body.search_terms;
+	twitter_dashboard.update_search_terms(search_terms)
+	.then(function(doc){
+		res.send({status:'OK', message:'SEARCH_TERMS_UPDATED'});
 	});
-	
-	tweet_queue.push(tweet_model);
-};
+	return;
+});
+router.post('/locations', function(req, res){  });
+router.post('/mined_data', function(req, res){  });
 
 
-currentSearchTerms = 'node.js,js,javascript';
-t.on('tweet', handle_tweet_received);
+app.use(router);
 
-t.track(currentSearchTerms);
-console.log("Tracking : " + currentSearchTerms);
+twitter_dashboard.init();
+//t.on('tweet', handle_tweet_received);
+//t.track(currentSearchTerms);
+//console.log("Tracking : " + currentSearchTerms);
+
 //t.location('-180,-90,180,90',true);
-
-var currentInterval = setInterval(emit_tweet,timeBetweenTweets);
 
 
 app.post('/compile_code', function(req, res) {
@@ -122,18 +119,7 @@ app.post('/compile_code', function(req, res) {
 				res.send(response);
 				//Refactor !
 			});
-//			exec('ls | grep .png', function(error, stdout, stderr) {
-//				console.log('error : ', error);
-//				console.log('stderr : ', stderr);
-//				console.log('stdout : ', stdout);
-//			});
-			/*
-				options(device = function() png(width = 960))
-				cars <- c(1, 3, 6, 4, 9)
-				plot(cars)
-				cars2 <- c(1, 2, 3, 4, 5)
-				plot(cars2)
-			*/
+
 		});
 	});	
 	})
@@ -143,28 +129,24 @@ app.post('/compile_code', function(req, res) {
 
 
 app.post('/update_frequency', function(req, res) {
-	console.log("POST: update_frequency");
-	var new_interval = parseInt(req.body.frequency);
-	clearInterval(currentInterval);
-	currentInterval = setInterval(emit_tweet,new_interval);
-	res.send('ok');
+	
 });
 
 app.post('/search', function(req, res) {
-	console.log("POST: search");
-	var search_terms = req.body.search_terms;
-	t.untrack(currentSearchTerms);	
-	currentSearchTerms = search_terms;
-	tweet_queue.removeAll();
-	t.track(currentSearchTerms);
-	res.send("ok");
+//	console.log("POST: search");
+//	var search_terms = req.body.search_terms;
+//	t.untrack(currentSearchTerms);	
+//	currentSearchTerms = search_terms;
+//	tweet_queue.removeAll();
+//	t.track(currentSearchTerms);
+//	res.send("ok");
 });
 
 app.post('/locations', function(req, res) {
 	console.log("POST: locations");
 	db.getTweetLocations(currentSearchTerms, function(tweets) {
 		
-		response = {
+		var response = {
 			'status' : 'OK',
 		    'tweets' : tweets 
 		};
@@ -192,19 +174,5 @@ app.listen(port);
 
 console.log("Application is running on http://localhost:8080")
 
-io.sockets.on('connection',function(socket){
-	console.log("SOCKET:RECEIVED connection");
-	socket.on('start', function(){
-		console.log("SOCKET:RECEIVED start")
-		console.log("Client is ready to start receiving events");
-	});
 
-	socket.emit('connected', function(){
-		console.log("SOCKET:EMIT connected")
-	});
-
-	socket.on('disconnect', function(o){
-		console.log("SOCKET:RECEIVED disconnect",o)
-	});
-});
 

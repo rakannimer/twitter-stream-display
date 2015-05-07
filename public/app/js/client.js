@@ -358,7 +358,7 @@ var tweetStream = {
 		var tweet_frequency = parseInt($("#tweet_frequency").val());
 		tweet_frequency = tweet_frequency*1000;
 		$.ajax({
-			url: '/update_frequency',
+			url: '/frequency',
 			success: function(response) {
 				console.log(response);
 			},
@@ -424,7 +424,7 @@ var code_editor = {
 		if(typeof stored_code !== 'undefined') {
 			//this.editor.setValue(stored_code);	
 		}
-		this.editor.setValue(stored_data.r_examples.temp);
+		this.editor.setValue(stored_data.r_examples.count_entries);
 		this.editor.setCursor(this.editor.lineCount(), 0);
 	},
 
@@ -441,7 +441,7 @@ var code_editor = {
 		    cm.replaceSelection(spaces);
 		  }
 		});
-		this.console.setValue("Ready for your commands \n");
+		this.console.setValue("Ready \n");
 	},
 	
 	clear_console: function() {
