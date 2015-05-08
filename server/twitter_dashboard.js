@@ -9,14 +9,27 @@ var async = require('async'),
 	q = require("q"),
 	timeBetweenTweets = 200,
 	twitter_dashboard = {
-		current_search_terms:'node.js,javascript',
+		current_search_terms:'',
 		tweet_queue :tweet_queue,
 		init: function() {
 			var self = this;
-			db.get_current_search_terms().then(function(){
+			this.get_current_search_terms().then(function(){
 				self.track_tweets();
 				self.current_interval = setInterval(function(){self.emit_tweet(self);}, self.time_between_tweets);
 			});
+		},
+		
+		get_current_search_terms: function() {
+			var deferred = q.defer();
+			var self = this;
+			if (this.current_search_terms !== '') {
+				deferred.resolve(this.current_search_terms);
+			}
+			db.get_current_search_terms().then(function(current_search_terms){
+				self.current_search_terms = current_search_terms;
+				deferred.resolve(current_search_terms);	
+			});
+			return deferred.promise;
 		},
 		
 		emit_tweet : function(self) {
@@ -28,7 +41,6 @@ var async = require('async'),
 				'status' : 'OK',
 				'tweet': tweet
 			};
-			console.log("kjkj");
 			io.emit('server:tweet_received', JSON.stringify(data));
 		},
 		
@@ -69,6 +81,29 @@ var async = require('async'),
 			});
 			return deferred.promise;
 		},
+		get_history: function() {
+			var deferred = q.defer();
+			var self = this;
+			db.get_search_history()
+			.then(function(history) {
+				return deferred.resolve(history);
+			});
+			return deferred.promise;
+		},
+		get_tweet_locations: function() {
+			var deferred = q.defer();
+			var self = this;
+			//Get from db if not in memory 
+			this.get_current_search_terms()
+			.then(function(search_terms){
+				return db.get_tweet_locations(self.current_search_terms);
+			})
+			.then(function(locations){
+				return deferred.resolve(locations);
+			});
+			
+			return deferred.promise;
+		},
 		
 		init_sockets: function() {
 			// Move to different object
@@ -88,6 +123,7 @@ var async = require('async'),
 				});
 			});
 		}
+		
 	
 	};
 	

@@ -66,7 +66,6 @@ var db = {
 			else {
 				if (typeof result.languages !== 'undefined')
 				{
-					console.log(result.languages);
 					if (result.languages.length > 1) {
 						if (typeof result.languages[0] === 'object') {
 							language = result.languages[0].code;		
@@ -127,22 +126,24 @@ var db = {
 
 	},
 
-	getTweetLocations: function(search_terms, callback) {
+	get_tweet_locations: function(search_terms, callback) {
+		var deferred = q.defer();
 		var tweets = db_instance.collection('tweets');
 
 		tweets.find({search_terms:search_terms, geotagged: 1}, {location: 1}).toArray(function(err, docs) {
-			assert.equal(err, null);
-		    console.log("Found "+ docs.length+" records");
-		    if (docs.length > 0) {
-		    	console.log(docs[0].location);
-		    }
-		    callback(docs);
+			if (err !== null) {
+				return deferred.resolve(err);	
+			}
+			else {
+				console.log("Found "+ docs.length+" records with locations having search_terms "+ search_terms);
+				return deferred.resolve(docs.length > 0 ?docs:[]);	
+			}
 		  });
+		return deferred.promise;
 	},
 
-	getSearchTerms: function(callback) {
-//		var tweets = db_instance.collection('tweets');
-		//var count = 0;
+	get_search_history: function() {
+		var deferred = q.defer();
 		var self = this;
 		db_instance.tweets.aggregate([
 			//{$match:{'geotagged':1	}},
@@ -157,10 +158,47 @@ var db = {
 				}
 			 }
 		],function(err,docs){
-			var indexed_docs = self.indexBySearchTerms(docs);
-			console.log(indexed_docs);
-			callback(indexed_docs);
+			//Refactor ! Create object about what an indexed_doc should look like to make Business logic solid
+			var indexed_docs = self.format_search_history(docs);
+			return deferred.resolve(indexed_docs);
 		});
+		return deferred.promise;
+		
+	},
+	/*
+		Index by search_terms an array grouped by geotagged and search_terms tweet_count
+	*/
+	format_search_history: function(docs) {
+		var indexed_docs = [],
+			docPosition = -1;
+		for (var i = 0; i < docs.length; i++ ) {
+			
+			docPosition = indexed_docs.getIndexBy(['search_terms'], docs[i]['_id']['search_terms']);
+			if (docPosition === -1) {
+				indexed_docs.push(
+					{
+						search_terms : docs[i]['_id']['search_terms'],
+						geotagged: docs[i]['_id']['geotagged'],
+						count: docs[i]['count'],
+						geo_count: docs[i]['_id']['geotagged'] === 1?docs[i]['count']:0,
+						non_geo_count: docs[i]['_id']['geotagged'] === 0?docs[i]['count']:0
+					}
+				);
+				//indexed_docs.push(docs[i]);
+				console.log("NOT FOUND");
+			}
+			else {
+				if (docs[i]['_id']['geotagged'] === 1) {
+					indexed_docs[docPosition].geo_count = docs[i].count;
+				}
+				else if (docs[i]['_id']['geotagged'] === 0) {
+					indexed_docs[docPosition].non_geo_count = docs[i].count;
+				}
+				indexed_docs[docPosition].count += docs[i].count;
+			}
+			
+		}
+		return indexed_docs;
 	},
 
 	indexBySearchTerms: function(docs) {
@@ -201,7 +239,6 @@ var db = {
 		var deferred = q.defer();
 		
 		if (db_instance === null) {
-
 			deferred.resolve(false);
 			return deferred.promise;
 		}
@@ -237,7 +274,7 @@ var db = {
 		sessions.find({user_id:1}).toArray(function(err, docs) {
 			if (docs.length > 0) {
 				console.log("Current search terms :",docs[0].current_search_terms);
-				return deferred.resolve(docs[0]);	
+				return deferred.resolve(docs[0].current_search_terms);	
 			}
 			return false;
 		});

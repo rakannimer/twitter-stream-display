@@ -41,12 +41,13 @@ var tweetStream = {
 	showing_heatmap: false,
 	showing_markers: false,
 	heatmap:null,
-	metadata:null,
+	search_history:null,
 
 	init: function() {
 		//this.init_socket();
 		this.bind_dom_events();
-		this.getMinedMetaData().then(this.render_tags);
+		this.get_search_history().then(this.render_tags);
+		this.get_current_search_terms().then(this.render_current_search);
 	},
 	init_socket: function(){
 		var connected = this.connect();
@@ -107,21 +108,6 @@ var tweetStream = {
 			return false;
 		}
 		toastr[type](message);
-
-		/*
-		// If Twitter bootstrap alerts
-		if (type !== 'success' && type !== 'info' && type !== 'warning' && type !== 'danger') {
-			return false;
-		}
-
-		$("#alert").html(message).addClass('alert-'+type).fadeIn('fast',function() {
-			setTimeout(function(){
-				$("#alert").fadeOut('slow',function(){
-					$("#alert").removeClass('alert-'+type);	
-				});
-			}, 2000);
-		});
-		*/
 	},
 
 	show_loading: function(component) {
@@ -138,6 +124,9 @@ var tweetStream = {
 				$("#tweets_loading").addClass('hide');
 				break;
 		}
+	},
+	render_current_search: function(self){
+		$('#current_search_terms').html(self.current_search_terms);
 	},
 
 	bind_dom_events: function() {
@@ -250,11 +239,10 @@ var tweetStream = {
 		var latLng_point;
 		var self = this;
 		var deferred = q.defer();
-		$.post('/locations',{},function(response){
+		$.get('/locations',{},function(response){
 			
 			if (response.status === 'OK') {
-				var tweets = response.tweets;
-				var current_tweeet;
+				var tweets = response.data;
 				for (var i = 0; i < tweets.length; i++) {
 					latLng_point = new google.maps.LatLng(tweets[i].location.lng,tweets[i].location.lat);
 					self.latLng_points.push(latLng_point);
@@ -266,13 +254,23 @@ var tweetStream = {
 		});
 		return deferred.promise;
 	},
-
-	getMinedMetaData: function() {
+	
+	get_current_search_terms: function() {
 		var deferred = q.defer();
 		var self = this;
-		$.post('/metadata',{},function(response){
-			self.archived_tweets = response.tweets;
-			self.current_search_terms = response.current_search_terms;
+		$.get('/search',{},function(response){
+			self.current_search_terms = response.data.current_search_terms;
+
+			return deferred.resolve(self);
+		});
+		return deferred.promise;	
+	},
+
+	get_search_history: function() {
+		var deferred = q.defer();
+		var self = this;
+		$.get('/search_history',{},function(response){
+			self.search_history = response.data;
 			return deferred.resolve(self);
 		});
 		return deferred.promise;
@@ -281,10 +279,8 @@ var tweetStream = {
 	render_tags:function(self){
 		
 		var compiledTemplate = _.template(archive_template);
-        compiledTemplate = compiledTemplate({archived_tweets: self.archived_tweets});
-		console.log(self.archived_tweets);
+        compiledTemplate = compiledTemplate({archived_tweets: self.search_history});
         $("#tweet_archive").html(compiledTemplate);
-        $('#current_search_terms').html(self.current_search_terms);
 
 	},
 	show_on_map: function(e) {
@@ -351,6 +347,7 @@ var tweetStream = {
 			},
 			type:'POST'
 		});
+		$("#current_search_terms").html(search_terms);
 	},
 
 	update_frequency_clicked: function() {
@@ -452,10 +449,23 @@ var code_editor = {
 		this.console.setValue(this.console.getValue()+message+"\n");
 		this.console.setCursor(this.console.lineCount(), 0);
 	},
+	
+	write_to_editor: function(message) {
+		this.editor.setValue(message);
+		this.editor.setCursor(this.editor.lineCount(), 0);	
+	},
 
 	bind_dom_events: function() {
 		$("#compile_r").on('click', {context: this}, this.compile_r_clicked);
 		$("#clear_console").on('click', {context: this}, this.clear_console_clicked);
+		$('.example').on('click', {context:this}, this.example_clicked);
+	},
+	example_clicked: function(e) {
+		var self = e.data.context,
+			example_id = e.target.id;
+			alert("here");
+		self.write_to_editor(storage.getItem(example_id));
+
 	},
 	refresh_code_mirror: function() {
 		this.editor.refresh();
@@ -471,30 +481,39 @@ var code_editor = {
 		var code = self.editor.getValue();
 		toastr['info']('Compiling Code');
 		$.post('/compile_code',{code: code},function(response) {
-			var output = response.message.output;
-			//$("#code_result").html(output);
-			self.write_to_console(output);
-			if (response.status === 'ok') {
+			var output = response.data.output;
+			
+			
+			
+			
+			if (typeof output.stderr === 'undefined') {
 				toastr['success']('Code compiled without errors');
-				if (response.message.graphs.length > 0) {
-					$("#graphs_result").html("");
-					for (var i =0; i < response.message.graphs.length; i++) {
-						$("#graphs_result").append('<a class="gallery-item"  href="'+response.message.graphs[i]+'"><img style="width:200px;height:100px;" src="'+response.message.graphs[i]+'" /></a>');
-					}
-					$('.gallery-item').magnificPopup({
-					  type: 'image',
-					  gallery:{
-					    enabled:true
-					  }
-					});
-				}
 			}
 			else {
+				self.write_to_console(output.stderr);
 				toastr['error']('Something happened');
+			}
+			if (typeof output.stdout === 'undefined') {
+				self.write_to_console('Done. \n');
+			}
+			else {
+				self.write_to_console(output.stdout);	
+			}			
+			
+			if (response.data.graphs.length > 0) {
+				$("#graphs_result").html("");
+				for (var i =0; i < response.data.graphs.length; i++) {
+					$("#graphs_result").append('<a class="gallery-item"  href="'+response.data.graphs[i]+'"><img style="width:200px;height:100px;" src="'+response.data.graphs[i]+'" /></a>');
+				}
+				$('.gallery-item').magnificPopup({
+				  type: 'image',
+				  gallery:{
+				    enabled:true
+				  }
+				});
 			}
 			
 		});
-		
 	}
 };
 
@@ -521,7 +540,6 @@ var router = {
 	route: function( hashes) {
 		var self = this;
 
-				
 		if (hashes.length < 2 ) {
 			return;
 		}
@@ -543,11 +561,12 @@ var router = {
 					code_editor.load_console();
 					$("#app_container").children().hide();
 					$("#code").show();
-					// http://jtmorris.net/2013/06/codemirror-editor-not-displaying-default-value/
 					code_editor.refresh_code_mirror()
 					self.page = 'code';
 				}
 				break;
+			case 'config':
+				alert("soon");
 		}
 	} 
 }
@@ -568,7 +587,10 @@ var storage = {
 		localStorage.setItem(key,data);
 	},
 	getItem: function(key) {
-		return localStorage[key];
+		if(typeof localStorage[key] !== 'undefined') {
+			return localStorage[key];
+		}
+		return "";
 	}
 }
 
