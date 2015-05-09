@@ -10,10 +10,50 @@ var uuid= require('node-uuid'),
 	async = require('async'),
 	exec = require('child_process').exec,
 	r_template = require('./templates/header.r'),
+	logger = require('tracer').colorConsole({
+                    format : "{{timestamp}} <{{title}}> {{message}} (in {{file}}:{{line}})",
+                    dateformat : "HH:MM:ss.L"
+                }),
 	r_helper = {
 		graph_paths: [],
 		code_folder : 'user-code',
+		examples_folder_path: './public/R-examples/',
+		examples: [],
+		public_examples_path: '/R-examples/',
 		init: function() {
+			//this.prepare_dir();
+		},
+		get_examples: function() {
+			var deferred = q.defer();
+			var self = this;
+			
+			fs.readFile(this.examples_folder_path+'/examples.json','utf8',function(err,data){
+				if(err) throw err;
+				var r_examples = JSON.parse(data);
+				self.examples = r_examples;
+				
+				return deferred.resolve( 
+					{public_path: self.public_examples_path,
+					 examples:self.examples} 
+				);
+			});
+//			fs.readdir(this.examples_folder_path, function(err, files){
+//				if (err !== null) {
+//					return deferred.reject({status:'READ_DIR', message:err});
+//				}
+//				var file_names = [];
+//				for (var i = 0; i < files.length; i++) {
+//					if (files[i].indexOf(".r") > -1){
+//						file_names.push(files[i]);
+//						self.examples_file_path.push('/R-examples/'+files[i]);
+//						logger.trace("R script Found %s", self.examples_file_path[i]);
+//					}
+//				}
+//				return deferred.resolve( {paths:self.examples_file_path,names:file_names});
+//			});
+			return deferred.promise;
+		},
+		prepare_dir: function() {
 			var folder_name = this.mk_folder_name();
 			this.folder_path = './public/user-code/'+folder_name;	
 			this.public_folder_path = '/user-code/'+folder_name;
@@ -24,6 +64,7 @@ var uuid= require('node-uuid'),
 			return 'r-twitter-'+uuid.v1();
 		},
 		compile: function(code) {
+			this.prepare_dir();
 			var deferred = q.defer(),
 			 	self = this,
 			 	compile_output;
@@ -31,22 +72,22 @@ var uuid= require('node-uuid'),
 			this.mkdir(this.folder_path)
 			.then( function(){  
 				return self.write_code_to_fs(code); 
-			})
+			}, function(e){console.log("ERor Writing code ",e)})
 			.then(function(params){ 
 				return self.compile_r_script(); 
 			})
-			.then(function(compile_out){
-				compile_output = compile_out;
+			.then(function(r_compile_output){
+				compile_output = r_compile_output;
 				
 				return self.get_graphs_paths();
-			})
+			}, function(){console.log("Eror getting getting graphs")})
 			.then(function(params) {
-				console.log("ASD");
+				
 				return deferred.resolve({
-					output: {stdout: params.stdout, stderr: params.stderr},
+					output: compile_output,
 					graphs: self.graph_paths
 				});
-			});
+			}, function(e){logger.error("Error Compiling R script %s, Error : %d",self.code_file_path,e)});
 			
 			return deferred.promise;
 			
@@ -54,12 +95,11 @@ var uuid= require('node-uuid'),
 		compile_r_script: function() {
 			var deferred = q.defer();
 			var self = this;
-			console.log("Compiling R");
+			logger.trace("Compiling R");
 			
 			exec('Rscript '+self.code_file_path, function(err, stdout, stderr){
-				console.log("HERE");
 				var r_output = {err: err, stdout: stdout, stderr: stderr};
-				console.log(r_output);
+				logger.info('Rscript compile output: %j ',r_output);
 				return deferred.resolve(r_output);
 			});
 			return deferred.promise;
@@ -76,7 +116,6 @@ var uuid= require('node-uuid'),
 		get_graphs_paths: function() {
 			var deferred = q.defer();
 			var self = this;
-			console.log("here");
 			fs.readdir(this.folder_path, function(err, files) {
 				if (err !== null) {
 					return deferred.reject({status:'READ_DIR', message:err});
@@ -84,7 +123,7 @@ var uuid= require('node-uuid'),
 				for (var i = 0; i < files.length; i++) {
 					if (files[i].indexOf(".png") > -1){
 						self.graph_paths.push(self.public_folder_path +'/'+files[i]);
-						console.log("Image Found");
+						logger.trace("Graph Found %s", self.graph_paths[i]);
 					}
 				}
 				return deferred.resolve(self.graph_paths);
@@ -101,7 +140,7 @@ var uuid= require('node-uuid'),
 				if (err) {
 					return deferred.reject({status:'CREATE_FILE', message:err});
 				}
-				console.log(r_head+code);
+				logger.trace("Code Written to %s , \nFile content :\n%s",self.code_file_path,r_head+code);
 				return deferred.resolve(true);
 			});
 			return deferred.promise;

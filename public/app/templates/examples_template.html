@@ -1,0 +1,9 @@
+<ul>
+	<% for (var i = 0; i < data.examples.length; i++) { console.log(data.examples); %>
+		<li> 
+			<a class="example" data-href="<%=data.public_path%>/<%= data.examples[i].fileName %>" > 
+				<%= data.examples[i].shortDescription %> 
+			</a>
+		</li>
+	<% } %>
+</ul>

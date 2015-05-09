@@ -2,7 +2,7 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	app = express(),
 	router = express.Router(),
-	port = process.env.PORT || 8080,
+	port = 8080,
 	r_helper = require('./server/r_helper.js'),
 	twitter_dashboard = require('./server/twitter_dashboard.js');
 
@@ -12,9 +12,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(router);
 
 router.post('/compile_code',function(req, res){
-	r_helper.compile(req.body.code).then(function(output) {
-		res.send({status:'OK', data: output})
-		console.log("OUTPUT : ", output);
+	
+	r_helper.compile(req.body.code).then(function(data) {
+		var status = (data.output.err === null)?'OK':'ERROR';
+		var response = {
+			status: status,
+			data: data
+		};
+		res.send(response);
+
 	});
 });
 
@@ -60,7 +66,16 @@ router.get('/search_history', function(req, res){
 	});
  });
 
-
+router.get('/r_examples', function(req, res){
+	r_helper.get_examples().then(function(examples){
+		var response = {
+			'status' : 'OK',
+		    'data' : examples
+		};
+		console.log(response);
+		res.send(response);
+	});
+});
 
 twitter_dashboard.init();
 app.listen(port);

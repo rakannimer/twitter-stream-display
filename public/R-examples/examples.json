@@ -1,0 +1,23 @@
+[
+		{
+			"fileName" : "connect_to_mongo.r",
+			"shortDescription" : "Connect To Mongo",
+			"longDescription": "Connect To Mongo Using R and rmongodb"
+		},
+		{
+			"fileName" : "count_mongo_records.r",
+			"shortDescription" : "Count All Mongo Records",
+			"longDescription": "Count All Mongo Records"
+		},
+		{
+			"fileName" : "show_collections.r",
+			"shortDescription" : "Display all collections",
+			"longDescription": "Display all collections in a given database"
+		},
+		{
+			"fileName" : "volcano.r",
+			"shortDescription" : "Volcano Plot",
+			"longDescription": "Nice looking volcano plot"
+		}
+		
+]

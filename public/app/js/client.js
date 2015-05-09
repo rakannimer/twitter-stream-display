@@ -12,7 +12,9 @@ var creds = require('./creds.js');
 var codemirror = require('codemirror');
 require('magnific-popup');
 require('codemirror/mode/r/r');
+//require('jquery-ui/resizable');
 var stored_data = require('./stored_data');
+var examples_template = require('../templates/examples_template.html');
 
 $('.gallery-item').magnificPopup({
   type: 'image',
@@ -393,10 +395,24 @@ var tweetStream = {
 
 
 
-
 var code_editor = {
 	init: function() {
 		this.bind_dom_events();
+		this.load_examples();
+		
+	},
+	load_examples: function() {
+		var self = this;
+		$.get('/r_examples', function(response){
+			if (response.status === 'OK') {
+				var compiledTemplate = _.template(examples_template);
+				compiledTemplate = compiledTemplate({data: response.data});
+				$("#examples").html(compiledTemplate);
+				self.bind_example_dom_events();
+			}
+			//response.data.examples_path
+						
+		});
 	},
 	load_editor: function(){
 		var self = this;
@@ -446,7 +462,7 @@ var code_editor = {
 	},
 
 	write_to_console: function(message) {
-		this.console.setValue(this.console.getValue()+message+"\n");
+		this.console.setValue(this.console.getValue()+message);
 		this.console.setCursor(this.console.lineCount(), 0);
 	},
 	
@@ -458,13 +474,24 @@ var code_editor = {
 	bind_dom_events: function() {
 		$("#compile_r").on('click', {context: this}, this.compile_r_clicked);
 		$("#clear_console").on('click', {context: this}, this.clear_console_clicked);
-		$('.example').on('click', {context:this}, this.example_clicked);
+	},
+	bind_example_dom_events: function() {
+		$('.example').on('click', {context:this}, this.example_clicked);	
 	},
 	example_clicked: function(e) {
-		var self = e.data.context,
-			example_id = e.target.id;
-			alert("here");
-		self.write_to_editor(storage.getItem(example_id));
+		var self = e.data.context;
+		
+		var example_path = $(e.target).attr('data-href');
+		if (storage.exists(example_path)) {
+			self.write_to_editor(storage.getItem(example_path));
+		}
+		else {
+			
+			$.get(example_path, function(response) {
+				storage.setItem(example_path, response);
+				self.write_to_editor(response);
+			});	
+		}
 
 	},
 	refresh_code_mirror: function() {
@@ -483,22 +510,20 @@ var code_editor = {
 		$.post('/compile_code',{code: code},function(response) {
 			var output = response.data.output;
 			
-			
-			
-			
-			if (typeof output.stderr === 'undefined') {
+			if (response.status === 'OK') {
 				toastr['success']('Code compiled without errors');
 			}
 			else {
 				self.write_to_console(output.stderr);
 				toastr['error']('Something happened');
 			}
+
 			if (typeof output.stdout === 'undefined') {
 				self.write_to_console('Done. \n');
 			}
 			else {
 				self.write_to_console(output.stdout);	
-			}			
+			}
 			
 			if (response.data.graphs.length > 0) {
 				$("#graphs_result").html("");
@@ -591,6 +616,9 @@ var storage = {
 			return localStorage[key];
 		}
 		return "";
+	},
+	exists: function(key) {
+		return (typeof localStorage[key] !== 'undefined');
 	}
 }
 

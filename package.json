@@ -27,6 +27,7 @@
     "socket.io": "^1.3.5",
     "socket.io-browserify": "^0.9.6",
     "toastr": "^2.0.4",
+    "tracer": "^0.7.4",
     "tweet-dom-creator": "git://github.com/RakanNimer/tweet-dom-creator.git",
     "twit": "^1.1.20"
   },
