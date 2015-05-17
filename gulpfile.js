@@ -79,6 +79,7 @@ gulp.task('build-remote',['copy-deployment-file'], function(){
       .shell(['bash /build_env.sh']).pipe(gulp.dest('logs'));
 });
 
+
 gulp.task('deploy',['copy-creds'], function() {
 
    return gulpSSH
@@ -105,7 +106,9 @@ gulp.task('lint', function() {
 gulp.task('css', function() {
   return gulp.src([ './node_modules/bootstrap/dist/css/bootstrap.css','./node_modules/codemirror/lib/codemirror.css', './node_modules/magnific-popup/dist/magnific-popup.css' ,'./node_modules/toastr/toastr.css',
   './node_modules/codemirror/theme/blackboard.css',
-  './public/app/css/*.css'])
+  './public/app/css/*.css',
+  
+  ])
     .pipe(concat('app.min.css'))
     //.pipe(minifyCSS())
     .pipe(gulp.dest('./public/app/'));

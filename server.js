@@ -4,12 +4,57 @@ var express = require('express'),
 	router = express.Router(),
 	port = 8080,
 	r_helper = require('./server/r_helper.js'),
-	twitter_dashboard = require('./server/twitter_dashboard.js');
+	//twitter_dashboard = require('./server/twitter_dashboard.js'),
+	TweetTracker = require('./server/services/TweetTracker'),
+	routes = require('./server/routes'),
+	SocketRouter = require('./server/services/SocketRouter'),
+	StreamSettings = require('./server/models/StreamSettings'),
+	mongoose = require("mongoose");
+
+mongoose.connect('mongodb://localhost:27017/tweet_streams/', function(err){
+	if (err) {throw err; }
+
+	
+	var socket_router = new SocketRouter();
+	var tweet_tracker = new TweetTracker();
+
+	StreamSettings.get({user_id:1})
+		.then(function(settings){
+			tweet_tracker.start_stream(settings.current_search_terms);
+			return settings.tweet_frequency;
+		})
+
+
 
 
 app.use(express.static('public/'));
 app.use(bodyParser.urlencoded({ extended: false }));	
+
+//var routes = require('./server/routes');
+app.use('/', routes);
 app.use(router);
+//twitter_dashboard.init();
+app.listen(port);
+console.log("Application is running on http://localhost:8080")
+
+
+});
+
+/*
+	routes/
+		stream_settings.js
+			POST frequency	
+			POST search
+			GET  search
+		mine.js
+			GET	 locations
+			GET  history
+		code.js
+			GET  examples
+			POST compile
+ */
+	
+/*
 
 router.post('/compile_code',function(req, res){
 	
@@ -33,6 +78,7 @@ router.post('/frequency', function(req, res) {
 
 router.post('/search', function(req, res){ 
 	console.log("POST: search");
+	
 	var search_terms = req.body.search_terms;
 	twitter_dashboard.update_search_terms(search_terms)
 	.then(function(doc){
@@ -42,7 +88,7 @@ router.post('/search', function(req, res){
 
 router.get('/search', function(req, res){
 	console.log("GET: search");
-	var search_terms = twitter_dashboard.get_current_search_terms()
+	twitter_dashboard.get_current_search_terms()
 	.then(function(search_terms){
 		res.send({'status':'ok', 'data': {current_search_terms: search_terms}});
 	});
@@ -77,9 +123,9 @@ router.get('/r_examples', function(req, res){
 	});
 });
 
-twitter_dashboard.init();
-app.listen(port);
-console.log("Application is running on http://localhost:8080")
+*/
+
+
 
 
 

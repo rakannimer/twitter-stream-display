@@ -172,6 +172,69 @@
   <link href='./app/app.min.css' rel='stylesheet' />
 </head>
 <body class="application">
+
+
+	
+<!-- Sidebar 
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        Start Bootstrap
+                    </a>
+                </li>
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Shortcuts</a>
+                </li>
+                <li>
+                    <a href="#">Overview</a>
+                </li>
+                <li>
+                    <a href="#">Events</a>
+                </li>
+                <li>
+                    <a href="#">About</a>
+                </li>
+                <li>
+                    <a href="#">Services</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+ <!-- /#sidebar-wrapper -->
+
+
+
+
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">            
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Twitter Mine</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+					<li><a href="#/">New Search</a></li>
+					<li><a href="#/code">R IDE</a></li>
+					<li><a href="#/history">History</a></li>
+						<li><a href="#/creds">Set Credentials</a></li>
+					<li><a href="https://github.com/RakanNimer/twitter-stream-display/">Source</a></li>              
+                </ul>
+            </div>
+        </nav>
+		
+
+		
+	<!--
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -197,8 +260,10 @@
       </div>
     </div>
   </div>
-
+ -->
+ 
   <div class="container-fluid" id="app_container">
+
 	<div class="row" id="code" style="display:none">
 		<div class="row">
 			<div class="col-sm-6">
@@ -223,11 +288,8 @@
 							<div class="chart-title">
 								Examples
 							</div>
-				      		<div class="chart-stage">
-								<a class="example" id="connect_to_mongo">Connect to Mongo</a>
-								<a class="example" id="show_collections">Show Collections</a>
-								<a class="example" id="count_entries">Count entries</a>
-								<a class="example" id="volcano">Volcano</a>
+				      		<div class="chart-stage" id ="examples">
+
 							</div>
 							<div class="chart-notes">
 							</div>
@@ -370,34 +432,34 @@
 						<div class="chart-stage">
                 			<div id="map">
                 			</div>
-							
 						</div>
-              		</div>
-              		<div class="chart-notes">
-                		Location of geo tagged tweets
+	              		<div class="chart-notes">
+	                		Location of geo-tagged tweets
+						</div>
 					</div>
 				</div>
-				<div class="col-sm-5 tweet_container">
-
-          			<div class="load-wrapp center-block hide" id="tweets_loading">
-				  		<div class="load-1">
-                			<p></p>
-                			<div class="line"></div>
-                			<div class="line"></div>
-                			<div class="line"></div>
-            			</div>
-            		<!--
-				  	<div class="load-9">
-				        <p></p>
-				        <div class="spinner">
-				        	<div class="bubble-1"></div>
-				        	<div class="bubble-2"></div>
+				<div class="col-sm-5">
+					<div class="chart-wrapper">
+						<div class="chart-title">
+							Tweets Stream
+						</div>
+			      		<div class="chart-stage tweet_container">
+							<div class="load-wrapp center-block hide" id="tweets_loading">
+						  		<div class="load-1">
+		                			<p></p>
+		                			<div class="line"></div>
+		                			<div class="line"></div>
+		                			<div class="line"></div>
+		            			</div>
+						 	</div>
+							<h5></h5>
+          					<div id="tweets" class=""></div>
+						</div>
+						<div class="chart-notes">
+							Real-time display of currently streaming tweets on the server
 						</div>
 					</div>
-					-->
-				 </div>
-				 <h5>Streamed Tweets : </h5>
-          		<div id="tweets" class=""></div>
+
           	</div>
 
 
@@ -433,7 +495,6 @@
 
 
 	<script src='./app/app.min.js'></script>
-
 </body>
 </html>
 

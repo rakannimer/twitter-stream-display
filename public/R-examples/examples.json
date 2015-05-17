@@ -18,6 +18,10 @@
 			"fileName" : "volcano.r",
 			"shortDescription" : "Volcano Plot",
 			"longDescription": "Nice looking volcano plot"
+		},
+		{
+			"fileName" : "get_tweets_by_key.r",
+			"shortDescription" : "Get Tweets By Key",
+			"longDescription": "Get tweets by key and convert to R dataframe"
 		}
-		
 ]

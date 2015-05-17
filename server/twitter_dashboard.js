@@ -14,7 +14,7 @@ var async = require('async'),
 		init: function() {
 			var self = this;
 			this.get_current_search_terms().then(function(){
-				self.track_tweets();
+				//self.track_tweets();
 				self.current_interval = setInterval(function(){self.emit_tweet(self);}, self.time_between_tweets);
 			});
 		},
@@ -45,11 +45,13 @@ var async = require('async'),
 		},
 		
 		handle_tweet_received : function(self, tweet) {
+			db.insert_into_influx(self.current_search_terms, tweet);
+			
 			var tweet_model = db.build_tweet_model(self.current_search_terms, tweet);
 			db.insertTweet(tweet_model, function(){
 				console.log("Inserted into mongo");
 			});
-			
+
 			this.tweet_queue.push(tweet_model);
 		},
 		
@@ -123,8 +125,6 @@ var async = require('async'),
 				});
 			});
 		}
-		
-	
 	};
 
 module.exports = twitter_dashboard;

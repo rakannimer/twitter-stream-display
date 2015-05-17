@@ -1,3 +1,4 @@
+
 a, a:focus, a:hover, a:active {
   color: #00afd7;
 }
@@ -160,6 +161,7 @@ h3 {
  * Full-page application style
  */
 
+
 body.application {
   background: #f2f2f2;
   padding: 60px 20px 0;
@@ -220,7 +222,7 @@ body.application hr {
 }
 
 .chart-wrapper .chart-stage {
-  /*min-height: 240px;*/
+  
   overflow: hidden;
   padding: 5px 10px;
   position: relative;

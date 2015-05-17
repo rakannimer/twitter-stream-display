@@ -1,7 +1,8 @@
 var mongojs = require('mongojs'),
 	assert = require('assert'),
 	language_detect = require('cld'),
-	q = require("q");
+	q = require("q"),
+	influx = require('influx');
 /*
 var insertTweets = function(db, callback) {
   // Get the tweets collection
@@ -16,6 +17,30 @@ var insertTweets = function(db, callback) {
   });
 }
 */
+
+JSON.flatten = function(data) {
+    var result = {};
+    function recurse (cur, prop) {
+        if (Object(cur) !== cur) {
+            result[prop] = cur;
+        } else if (Array.isArray(cur)) {
+             for(var i=0, l=cur.length; i<l; i++)
+                 recurse(cur[i], prop + "[" + i + "]");
+            if (l == 0)
+                result[prop] = null;
+        } else {
+            var isEmpty = true;
+            for (var p in cur) {
+                isEmpty = false;
+                recurse(cur[p], prop ? prop+"."+p : p);
+            }
+            if (isEmpty && prop)
+                result[prop] = null;
+        }
+    }
+    recurse(data, "");
+    return result;
+}
 
 Array.prototype.getIndexBy = function (keys, value) {
 	console.log("Current Search Term", value);
@@ -36,11 +61,13 @@ Array.prototype.getIndexBy = function (keys, value) {
 }
 
 var db_instance = null;
+var influx_client = null;
 
 var db = {
 	url : 'mongodb://localhost:27017/tweet_streams',
 	init: function(callback) {
 		db_instance =  mongojs(this.url,['tweets','geotagged_count','sessions']);
+		this.connect_to_influx();
 		return this;
 		// mongojs.connect(this.url, function(err, db) {
 		// 	console.log("Connected to mongo");
@@ -49,9 +76,62 @@ var db = {
 		// 	callback();
 		// });
 	},
+	connect_to_influx: function() {
+			influx_client = influx({
+				  host : 'localhost',
+				  port : 8086, // optional, default 8086
+				  protocol : 'http', // optional, default 'http'
+				  username : 'root',
+				  password : 'root',
+				  database : 'tweets'
+			});
+			
+	},
+	insert_into_influx: function(search_terms,tweet) {
+			
+			this.get_tweet_language(tweet.text).then(function(language){
+				tweet['language'] = language;
+				var tweet_obj = JSON.flatten(tweet);
+				influx_client.writePoint('test4', tweet_obj,  function(err, docs){
+					console.log("Error : ", err);
+					console.log("Docs : ", docs);
+				});	
+			});
+			
+	},
+	
+	get_tweet_language: function(tweet_text) {
+		var deferred = q.defer();
+		var language;
+		language_detect.detect(tweet_text, function(err, result) {
+			
+			if (err !== null) {
+				console.log("Language not detected");
+				console.log(err);
+				language = null;
+				return deferred.resolve(null);
+			}
+			else {
+				if (typeof result.languages !== 'undefined')
+				{
+					if (result.languages.length > 1) {
+						if (typeof result.languages[0] === 'object') {
+							language = result.languages[0].code;
+							return deferred.resolve(language);	
+						}
+					}
+					else {
+						return deferred.resolve(null);
+					}
+				}
+				
+			}
+		});
+		return deferred.promise;
+	},
 	build_tweet_model: function(search_terms,tweet) {
+		
 		var tweet_obj,
-			// different field to apply different index from geospatial one on geotagged
 			geotagged,
 			location,
 			language;
@@ -68,11 +148,11 @@ var db = {
 				{
 					if (result.languages.length > 1) {
 						if (typeof result.languages[0] === 'object') {
-							language = result.languages[0].code;		
+							language = result.languages[0].code;
+							tweet['language'] = language;	
 						}
 					}
 				}
-				
 			}
 		});
 
@@ -80,6 +160,7 @@ var db = {
 			if (tweet.coordinates){
 				location = {"lat": tweet.coordinates.coordinates[0], "lng": tweet.coordinates.coordinates[1]};
 				geotagged = 1;
+
 			}
 		}
 		

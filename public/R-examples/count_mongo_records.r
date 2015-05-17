@@ -6,4 +6,5 @@ db <- 'tweet_streams'
 collection <- 'tweets'
 namespace <- paste(db, collection, sep='.') 
 mongo <- mongo.create(host=host , db=db, username=username, password=password)
-print(mongo.count(mongo, namespace, mongo.bson.empty()))\
+count <- mongo.count(mongo, namespace, mongo.bson.empty())
+print(count)

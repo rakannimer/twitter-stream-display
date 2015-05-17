@@ -45,8 +45,8 @@ body {
 
 .tweet_container {
 	background: white;
-	height: 493px;
-  	overflow-y: auto;
+	height: 411px;
+  	overflow-y: auto !importants;
 }
 label {
 	font-weight:400 !important;
@@ -126,3 +126,22 @@ label {
  .example:hover {
 	 text-decoration:none;
  }
+ .navbar-brand {
+	 line-height: 24px;
+	   font-size: 22px;
+	   color: #646582
+ }
+ .navbar-fixed-top {
+	 height: 45px;
+ }
+ .navbar-nav {
+	 margin-top:0px;
+ }
+ 
+ .navbar-nav li a {
+	 color: #646582;
+ }
+ body.application {
+  background: #f2f2f2;
+  padding: 60px 20px 0;
+}

@@ -80,25 +80,29 @@ var tweetStream = {
 			self.logToUser('Disconnected (一_一) ','error');
 		});
 	},
-	start_tweet_stream: function() {
+	listen_to_tweet_stream: function() {
 		this.socket.on('server:tweet_received', function(tweet_data){
 			tweet_data = JSON.parse(tweet_data);
 			console.log(tweet_data.status);
 			switch(tweet_data.status) {
 				case 'OK':
-					if (tweet_data.tweet.location !== null) {
-						tweetNode = tweetDomCreator.createNode(tweet_data.tweet.tweet);
+					if (tweet_data.data.location !== null) {
+						var tweetNode = tweetDomCreator.createNode(tweet_data.data.tweet);
 						var $htmlTweetNode = $('<div />', {html:tweetNode});
 						$htmlTweetNode.find('.tweet').addClass("fancy_border");
 						$("#tweets").prepend($htmlTweetNode.html());
 					}
 					else {
-						tweetDomCreator.prependToNode(tweet_data.tweet.tweet, "#tweets");
+						tweetDomCreator.prependToNode(tweet_data.data.tweet, "#tweets");
 					}
 					break;
 			}
 			//
 		});
+	},
+	start_tweet_stream: function() {
+		this.socket.emit('server:stream_tweets');
+		this.listen_to_tweet_stream();
 	},
 
 	/*
@@ -127,6 +131,7 @@ var tweetStream = {
 				break;
 		}
 	},
+
 	render_current_search: function(self){
 		$('#current_search_terms').html(self.current_search_terms);
 	},
@@ -135,7 +140,7 @@ var tweetStream = {
 		var self = this;
 		$("#search_button").on('click', {context: this}, this.search_clicked);
 
-		$("#update_frequency").on('click', {context: this}, this.update_frequency_clicked);
+		$("#update_frequency").on('click', {context: this}, function(){ self.update_frequency_clicked.call(self);});
 		$("#stream_toggle").on('click', {context: this}, this.stream_toggle);
 		$("#heatmap_toggle").on('click', {context: this}, this.heatmap_toggle);
 		$("#markers_toggle").on('click', {context: this}, this.markers_toggle);
@@ -150,6 +155,7 @@ var tweetStream = {
 		var self = e.data.context;
 		console.log(self.showing_stream);
 		if (self.showing_stream === true) {
+			self.stop_tweet_stream();
 			self.socket.disconnect();
 			self.socket = null;
 			self.logToUser('Disconnected (一_一)','error');
@@ -162,6 +168,10 @@ var tweetStream = {
 			self.start_tweet_stream();
 		}
 		self.showing_stream = !self.showing_stream;
+	},
+
+	stop_tweet_stream: function() {
+		this.socket.emit('server:stop_tweets');
 	},
 
 	heatmap_toggle: function(e) {
@@ -241,12 +251,16 @@ var tweetStream = {
 		var latLng_point;
 		var self = this;
 		var deferred = q.defer();
-		$.get('/locations',{},function(response){
+		$.get('/mine/locations',{},function(response){
 			
 			if (response.status === 'OK') {
 				var tweets = response.data;
 				for (var i = 0; i < tweets.length; i++) {
-					latLng_point = new google.maps.LatLng(tweets[i].location.lng,tweets[i].location.lat);
+					var location = tweets[i].location,
+						 lng = location[0],
+						 lat = location[1];
+						 console.log(lat, lng);
+					latLng_point = new google.maps.LatLng(lng, lat);
 					self.latLng_points.push(latLng_point);
 					
 				}
@@ -260,7 +274,7 @@ var tweetStream = {
 	get_current_search_terms: function() {
 		var deferred = q.defer();
 		var self = this;
-		$.get('/search',{},function(response){
+		$.get('/stream_settings/search',{},function(response){
 			self.current_search_terms = response.data.current_search_terms;
 
 			return deferred.resolve(self);
@@ -271,7 +285,7 @@ var tweetStream = {
 	get_search_history: function() {
 		var deferred = q.defer();
 		var self = this;
-		$.get('/search_history',{},function(response){
+		$.get('/mine/history',{},function(response){
 			self.search_history = response.data;
 			return deferred.resolve(self);
 		});
@@ -288,7 +302,7 @@ var tweetStream = {
 	show_on_map: function(e) {
 		var self = e.data.context;
 		var latLng_point;
-		$.post('/locations',{},function(response){
+		$.post('/mine/locations',{},function(response){
 			
 			if (response.status === 'OK') {
 				var tweets = response.tweets;
@@ -337,7 +351,7 @@ var tweetStream = {
 
 	update_search: function(search_terms) {
 		$.ajax({
-			url: '/search',
+			url: '/stream_settings/search',
 			success: function(response) {
 				console.log(response);
 			},
@@ -353,22 +367,12 @@ var tweetStream = {
 	},
 
 	update_frequency_clicked: function() {
-
+		console.log(this);
+		console.log(this.socket);
 		var tweet_frequency = parseInt($("#tweet_frequency").val());
 		tweet_frequency = tweet_frequency*1000;
-		$.ajax({
-			url: '/frequency',
-			success: function(response) {
-				console.log(response);
-			},
-			error: function() {
-				console.log('error');
-			},
-			data: {
-				frequency: tweet_frequency
-			},
-			type:'POST'
-		});
+		this.socket.emit('server:update_frequency', {tweet_frequency: tweet_frequency});
+
 	},
 	load_map: function(){
 		GoogleMapsLoader.KEY = creds.google_maps;
@@ -396,6 +400,8 @@ var tweetStream = {
 
 
 var code_editor = {
+	editor: null,
+	console:null,
 	init: function() {
 		this.bind_dom_events();
 		this.load_examples();
@@ -403,7 +409,7 @@ var code_editor = {
 	},
 	load_examples: function() {
 		var self = this;
-		$.get('/r_examples', function(response){
+		$.get('/code/examples', function(response){
 			if (response.status === 'OK') {
 				var compiledTemplate = _.template(examples_template);
 				compiledTemplate = compiledTemplate({data: response.data});
@@ -415,6 +421,9 @@ var code_editor = {
 		});
 	},
 	load_editor: function(){
+		if (this.editor !== null) {
+			return;
+		}
 		var self = this;
 		this.editor = codemirror.fromTextArea($("#code_editor").get(0), {
 			lineNumbers: true,
@@ -442,6 +451,9 @@ var code_editor = {
 	},
 
 	load_console: function() {
+		if (this.console !== null) {
+			return;
+		}
 		this.console = codemirror.fromTextArea($("#console_editor").get(0), {
 			mode: "r",
 			theme: "blackboard",
@@ -476,7 +488,7 @@ var code_editor = {
 		$("#clear_console").on('click', {context: this}, this.clear_console_clicked);
 	},
 	bind_example_dom_events: function() {
-		$('.example').on('click', {context:this}, this.example_clicked);	
+		$('.example').on('click', {context:this}, this.example_clicked);
 	},
 	example_clicked: function(e) {
 		var self = e.data.context;
@@ -507,7 +519,7 @@ var code_editor = {
 		var self = e.data.context;
 		var code = self.editor.getValue();
 		toastr['info']('Compiling Code');
-		$.post('/compile_code',{code: code},function(response) {
+		$.post('/code/compile',{code: code},function(response) {
 			var output = response.data.output;
 			
 			if (response.status === 'OK') {
@@ -522,7 +534,10 @@ var code_editor = {
 				self.write_to_console('Done. \n');
 			}
 			else {
-				self.write_to_console(output.stdout);	
+				self.write_to_console(output.stdout);
+				if (output.stderr !== '') {
+					self.write_to_console(output.stderr);
+				}
 			}
 			
 			if (response.data.graphs.length > 0) {

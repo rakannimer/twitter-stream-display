@@ -7500,132 +7500,7 @@ button.toast-close-button {
 .CodeMirror {
 	width: 100%;	  
 }
-/*
-From https://github.com/GroundXaero/bootstrap-easy-sidebar
-Credits to them !
-*/
 
-html.easy-sidebar-active {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  position: fixed;
-}
-body {
-	margin: 0;
-	padding: 0;
-	position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.easy-sidebar-container {
-	transition: 0.2s ease;
-	min-height: 100%;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	overflow: auto;
-}
-.easy-sidebar-container.toggled {
-	-webkit-transform: translateX(250px);
-	transform: translateX(250px);
-}
-
-.navbar.easy-sidebar {
-	transition: 0.2s ease;
-	position: fixed;
-	width: 250px;
-	top: 0;
-	left: -250px;
-	bottom: 0;
-	border-radius: 0;
-	margin: 0;
-	overflow: auto;
-	z-index: 9999;
-}
-
-.navbar.easy-sidebar.toggled {
-	left: 0px;
-}
-
-.easy-sidebar .btn {
-	width: 100%;
-}
-
-.navbar.easy-sidebar .navbar-header {
-	margin: 0 -15px;
-	float: none;
-}
-
-.navbar.easy-sidebar .navbar-brand {
-	margin: 0;
-}
-
-.navbar.easy-sidebar .navbar-toggle {
-	display: inline-block;
-}
-.navbar.easy-sidebar .navbar-toggle span.icon-bar:nth-child(2) {
-	-webkit-transform-origin: 0 50%;
-	transform-origin: 0 50%;
-	-webkit-transform: translate(2px, -5px) rotate(45deg);
-	transform: translate(2px, -5px) rotate(45deg)
-}
-.navbar.easy-sidebar .navbar-toggle span.icon-bar:nth-child(3) {
-	display: none;
-}
-.navbar.easy-sidebar .navbar-toggle span.icon-bar:nth-child(4) {
-	-webkit-transform-origin: 0 50%;
-	transform-origin: 0 50%;
-	-webkit-transform: translate(2px, 4.5px) rotate(-45deg);
-	transform: translate(2px, 4.5px) rotate(-45deg);
-}
-
-.navbar.easy-sidebar .nav.navbar-nav {
-	margin: 7.5px -15px;
-	float: none;
-}
-.navbar.easy-sidebar .nav.navbar-nav>li {
-	float: none;
-}
-.navbar.easy-sidebar .nav.navbar-nav>li>a {
-	padding: 10px 15px;
-}
-
-.navbar.easy-sidebar .navbar-nav .open .dropdown-menu .divider {
-	box-shadow: 0 1px 0 rgba(255,255,255, 0.1);
-}
-
-
-.navbar.easy-sidebar .navbar-form {
-	padding: 10px 15px;
-	margin: 8px -15px;
-	border-top-width: 1px;
-	border-top-style: solid;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	box-shadow: inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(255,255,255,.1);
-}
-.navbar.easy-sidebar .navbar-form .form-group {
-	margin-bottom: 5px;
-	display: block;
-}
-.navbar.easy-sidebar .navbar-form .form-group .form-control {
-	display: block;
-	width: 100%;
-}
-
-/*///// Media Queries /////*/
-
-/* Keep page content fully on the screen when sidebar is open for modern browsers when at desktop resolutions. */
-@media (min-width: 768px) {
-	.easy-sidebar-container.toggled {
-		width: calc(100% - 250px);
-	}
-}
 a, a:focus, a:hover, a:active {
   color: #00afd7;
 }
@@ -7788,6 +7663,7 @@ h3 {
  * Full-page application style
  */
 
+
 body.application {
   background: #f2f2f2;
   padding: 60px 20px 0;
@@ -7848,7 +7724,7 @@ body.application hr {
 }
 
 .chart-wrapper .chart-stage {
-  /*min-height: 240px;*/
+  
   overflow: hidden;
   padding: 5px 10px;
   position: relative;
@@ -7861,6 +7737,7 @@ body.application hr {
   font-size: 12px;
   padding: 8px 10px 5px;
 }
+
 /* -----------------------------------------
   =Default css to make the demo more pretty
 -------------------------------------------- */
@@ -8472,8 +8349,8 @@ body {
 
 .tweet_container {
 	background: white;
-	height: 493px;
-  	overflow-y: auto;
+	height: 411px;
+  	overflow-y: auto !importants;
 }
 label {
 	font-weight:400 !important;
@@ -8553,6 +8430,25 @@ label {
  .example:hover {
 	 text-decoration:none;
  }
+ .navbar-brand {
+	 line-height: 24px;
+	   font-size: 22px;
+	   color: #646582
+ }
+ .navbar-fixed-top {
+	 height: 45px;
+ }
+ .navbar-nav {
+	 margin-top:0px;
+ }
+ 
+ .navbar-nav li a {
+	 color: #646582;
+ }
+ body.application {
+  background: #f2f2f2;
+  padding: 60px 20px 0;
+}
 /*
 Taken from 
 http://codepen.io/mattcooper/pen/npEyu
@@ -8642,6 +8538,131 @@ body {
   padding-top: 70px;
 }
 */
+/*!
+ * Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+/* Toggle Styles */
+
+/*#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 250px;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: #000;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}*/
+
+/* Sidebar Styles */
+/*
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    width: 250px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: #fff;
+    background: none;
+}
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 250px;
+    }
+
+    #wrapper.toggled {
+        padding-left: 0;
+    }
+
+    #sidebar-wrapper {
+        width: 250px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        width: 0;
+    }
+
+    #page-content-wrapper {
+        padding: 20px;
+        position: relative;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-right: 0;
+    }
+}*/
 @import url('http://fonts.googleapis.com/css?family=Patua+One');
 
 .tags {
