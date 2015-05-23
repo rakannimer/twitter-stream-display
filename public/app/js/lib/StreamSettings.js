@@ -1,0 +1,3 @@
+var StreamSettings = function() {
+
+};

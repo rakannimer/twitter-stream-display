@@ -34,7 +34,7 @@ Array.prototype.getIndexBy = function (keys, value) {
 function format_search_history(docs) {
 	var indexed_docs = [],
 		docPosition = -1;
-	
+
 	for (var i = 0; i < docs.length; i++ ) {
 		console.log(i);
 		docPosition = indexed_docs.getIndexBy(['search_terms'], docs[i]['_id']['search_terms']);

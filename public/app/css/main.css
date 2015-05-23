@@ -1,29 +1,184 @@
+@font-face {
+    font-family: '8bit_wonder';
+    src: url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.eot');
+    src: url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.woff2') format('woff2'),
+         url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.woff') format('woff'),
+         url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.ttf') format('truetype'),
+         url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.svg#8bit_wondernominal') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+html {
+	font-family: '8bit_wonder' !important;
+}
+
+header {
+	padding-left: 240px;
+}
+main {
+	padding-left: 240px;
+}
+footer.page-footer {
+	padding-left: 240px;
+	background-color: #29abe1;
+	color : white;
+}
+
+.side-nav li {
+	padding : 0;
+}
+.side-nav a.logo {
+	height: 67px;
+	padding-top:10px !important;
+	margin-bottom:22px !important;
+	/*border-bottom: 1px solid #ddd;*/
+}
+
+.top-nav {
+	height: 109px;
+	background-color: #29abe1;
+	color: white;
+}
+
+.page_title {
+	font-size: 16px; 
+	font-weight: 400; 
+	padding-left:20px;
+	color:white;
+}
+
+.logo_container {
+	height: 95px;
+  	margin-bottom: 10px !important;
+  	padding-top: 9px;
+  	text-align:center;
+}
+
+.logo {
+	margin-top: 3px;
+  	border-bottom: 1px solid #ddd;
+}
+
+.nav-wrapper {
+	padding-top: 16px;
+}
+
+body {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+
+main {
+	flex: 1 0 auto;
+}
+
+.footer-container {
+	padding-left:20px;
+}
+.main_container {
+	padding : 15px;
+}
+
+.sidenav-item {
+	font-size: 12px !important;
+}
+.side-nav li {
+	border-bottom: 1px solid #ddd;
+}
+
+@media screen and (max-width: 992px) {
+	header, footer {
+  		padding-left: 0px;
+	}
+}
+
+.main-bg {
+	background: #29abe1 !important;
+	color: white;
+}
+.card-title {
+
+}
+
+.switch label .lever {
+	background-color: #B6B6B6;
+
+}
+
+.switch label {
+	color: white;
+}
+
+.switch label input[type=checkbox]:checked + .lever {
+  background-color: #ffe0b2;
+}
+
+.switch label input[type=checkbox]:checked + .lever:after {
+  background-color: #FF9800;
+}
+
+.input-field label {
+	color: white !important;
+}
+
+input#tweet_frequency {
+	border-bottom: solid 1px white !important;
+}
+#update_button_container {
+	margin-top: 25px;
+}
+
+.input-field label[for="tweet_frequency"] {
+	font-size: 8px;
+}
+#tweet_frequency_label {
+	font-size: 10px;
+}
+
+.card .card-title {
+	border-bottom: solid 1px white;
+  	padding-bottom: 5px;
+	font-size: 12px;
+}
+.stream-control {
+	margin-top:12px;
+}
+
+.material-tooltip {
+	color: white;
+	font-size: 10px;
+	/* border-radius: 0 0 14px 14px; */
+}
+
+.backdrop {
+	/*background-color : white;*/
+	background-color:#FF9800;
+
+}
+
+#update_tweet_frequency {
+	font-size: 10px;
+}
+
+/*
+
 body { 
+
 	margin:0; padding:0; 
 	background-image: url('/app/img/concrete_seamless.png');
 	height: 600px;
   	overflow-y: auto;
+  	
 }
 #map { 
 	position:relative;  
 	width:100%;
 	height:400px;
 }
-
-/*
-#controls
-{
-	min-width:500px;
-	background-color: white;
-	border-radius: 2px;
-	color: #444;
-	font-size: 14px;
-	background: #ecf0f1;
-	background: rgba(255,255,255,0.6); *
-	padding : 5px;
-
-}
-*/
 
 .controls {
 
@@ -38,7 +193,6 @@ body {
 .load-wrapp {
 	position: absolute;
 	float: initial!important;
-	/* width: inherit!important; */
 	left: 140px;
 	top: 145px;
 }
@@ -90,35 +244,13 @@ label {
 #show_search {
 	cursor: pointer;
 }
-/*.navbar-nav {
-	margin: 0;
-}*/
+
 .stats-list {
 	padding-left: 16px;
  	padding-top: 10px;	
 }
  
-/* #console_editor {
-	 height: 131px;
-  	 overflow-y: auto;
-	     display: block;
-	  padding: 9.5px;
-	  margin: 0 0 10px;
-	  font-size: 13px;
-	  line-height: 1.42857143;
-	  color:#333;
-	  word-break: break-all;
-	  word-wrap: break-word;
-	  background-color: #f5f5f5;
-	  border: 1px solid #ccc;
-	  border-radius: 4px;
- }
- 
-#console_editor_wrapper .CodeMirror-scroll {
-	 background-color: #f5f5f5;
-	  color:#333;
- }*/
- 
+
  .example {
 	 cursor:pointer;
  }
@@ -145,3 +277,5 @@ label {
   background: #f2f2f2;
   padding: 60px 20px 0;
 }
+
+*/
