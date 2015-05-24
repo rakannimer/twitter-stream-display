@@ -9029,6 +9029,128 @@ button.picker__today:focus, button.picker__clear:focus, button.picker__close:foc
   .picker--time .picker__box {
     margin-bottom: 5em; } }
 
+
+.tweet {
+    /*
+    width: 488px;
+    */
+    width: 421px;
+    min-height: 75px;
+    border-bottom: 1px solid #e1e8ed;
+    border-left: 1px solid #e1e8ed;
+    border-right: 1px solid #e1e8ed;
+    padding: 5px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: auto;
+    text-align: left;
+    background: rgba(255,255,255,0.6);
+}
+
+.tweet:hover{
+    cursor: pointer;
+    background: #f5f8fa;
+}
+
+.profile-image{
+    max-width: 50px;
+    float: left;
+}
+
+.profile-image img{
+    border-radius: 10px;
+    max-height: 50px;
+    max-width: 50px;
+}
+
+.user-info{
+    height: 20px;
+    float: left;
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+.user-info a:link, .user-info a:visited{
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-info a:hover{
+    color: #2FC2EF;
+    text-decoration: underline;
+}
+
+.username{
+    font-weight: bold;
+}
+
+.screen-name, .timestamp{
+    color: #8899a6;
+    margin-left: 5px;
+}
+
+.tweet-content{
+    float: left;
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+.tweet-content a:link, .tweet-content a:visited{
+    color: #2FC2EF;
+    text-decoration: none;
+}
+
+.tweet-content a:hover{
+    text-decoration: underline;
+}
+
+.tweet-image{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: inherit;
+    text-align: center;
+}
+
+.tweet-image img{
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 430px;
+    max-height: 100px;
+    border-radius: 5px;
+}
+
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    line-height: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+    width: 0;
+}
+
+
+
+
+.clearfix { display: inline-block; }
+/* start commented backslash hack \*/
+* html .clearfix { height: 1%; }
+.clearfix { display: block; }
+
+.fancy_border {
+      box-shadow: 0px 0px 10px 10px white inset, 0px 23px 21px -33px #000;
+      border-radius: 10%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      /* background-color: #f1f1f1; */
+      border-color: #167ac6;
+      border: solid 4px #167ac6;
+      /* width: 450px !important; */
+}
+
+
 @font-face {
     font-family: '8bit_wonder';
     src: url('/app/css/fonts/8bit_wonder/8-bit_wonder-webfont.eot');
@@ -9046,17 +9168,24 @@ html {
 	font-family: '8bit_wonder' !important;
 }
 
+
+.side-nav {
+	width:160px;
+}
+
 header {
-	padding-left: 240px;
+	padding-left: 160px;
 }
 main {
-	padding-left: 240px;
+	padding-left: 160px;
 }
 footer.page-footer {
-	padding-left: 240px;
+	padding-left: 160px;
 	background-color: #29abe1;
 	color : white;
 }
+
+
 
 .side-nav li {
 	padding : 0;
@@ -9069,7 +9198,8 @@ footer.page-footer {
 }
 
 .top-nav {
-	height: 109px;
+	/*height: 109px;*/
+	height: 74px;
 	background-color: #29abe1;
 	color: white;
 }
@@ -9082,7 +9212,8 @@ footer.page-footer {
 }
 
 .logo_container {
-	height: 95px;
+	/*height: 95px;*/
+	height: 60px;
   	margin-bottom: 10px !important;
   	padding-top: 9px;
   	text-align:center;
@@ -9094,7 +9225,8 @@ footer.page-footer {
 }
 
 .nav-wrapper {
-	padding-top: 16px;
+	/*padding-top: 16px;*/
+	padding-top: 4px;
 }
 
 body {
@@ -9115,7 +9247,8 @@ main {
 }
 
 .sidenav-item {
-	font-size: 12px !important;
+	/*font-size: 12px !important;*/
+	font-size: 9px !important;
 }
 .side-nav li {
 	border-bottom: 1px solid #ddd;
@@ -9195,118 +9328,26 @@ input#tweet_frequency {
 	font-size: 10px;
 }
 
-/*
-
-body { 
-
-	margin:0; padding:0; 
-	background-image: url('/app/img/concrete_seamless.png');
-	height: 600px;
-  	overflow-y: auto;
-  	
+.stats {
+	font-size: 10px;
 }
-#map { 
-	position:relative;  
+
+.preloader-wrapper.small {
+  width: 15px;
+  height: 15px;
+}
+
+.hide {
+	display:none;
+}
+
+#languages {
+	padding-top:10px;
+}
+
+.tweet {
 	width:100%;
-	height:400px;
-}
-
-.controls {
-
-}
-.form-group {
-	margin-top:20px;
-}
-#tweets {
-
-}
-
-.load-wrapp {
-	position: absolute;
-	float: initial!important;
-	left: 140px;
-	top: 145px;
-}
-
-.tweet_container {
-	background: white;
-	height: 411px;
-  	overflow-y: auto !importants;
-}
-label {
-	font-weight:400 !important;
-}
-.tags li {
-  list-style: none;
-  display: inline-block;
-  background-color: white;
-  border-radius: 5px;
-  padding: 5px 10px;
-  font-size: 18px;
-  font-family: 'Patua One',cursive;
-  color: #B2BAC2;
-  box-shadow: 0 0 5px #000;
-  margin: 3px 1px;
-  line-height: 27px;
-}
-
-.btn-default {
-	border-color: #ccc;
-}
-.tag {
-	width: 200px;
-}
-.mined-searches-terms {
-	width:100%;
-}
-.small-box {
-	display: block;
-	border: solid 1px #dedede;
-	padding: 5px;
-	border-radius: 9px;
-	padding-top: 13px;
-	padding-bottom: 13px;
-	padding-left: 12px;
-	padding-right: 12px;
-	margin-top: 10px;
+	margin-top: 5px;
 	margin-bottom: 5px;
 }
 
-#show_search {
-	cursor: pointer;
-}
-
-.stats-list {
-	padding-left: 16px;
- 	padding-top: 10px;	
-}
- 
-
- .example {
-	 cursor:pointer;
- }
- 
- .example:hover {
-	 text-decoration:none;
- }
- .navbar-brand {
-	 line-height: 24px;
-	   font-size: 22px;
-	   color: #646582
- }
- .navbar-fixed-top {
-	 height: 45px;
- }
- .navbar-nav {
-	 margin-top:0px;
- }
- 
- .navbar-nav li a {
-	 color: #646582;
- }
- body.application {
-  background: #f2f2f2;
-  padding: 60px 20px 0;
-}
-
-*/

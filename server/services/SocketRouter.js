@@ -17,7 +17,7 @@ var SocketRouter = function() {
 				tweet_tracker.stream_to_client(socket);	
 			}
 			else {
-				var tweet_frequency;
+				
 				StreamSettings.get({user_id:1})
 				.then(function(settings){
 					tweet_tracker.start_stream(settings.current_search_terms);
@@ -30,6 +30,24 @@ var SocketRouter = function() {
 			}
 		});
 		
+		socket.on('server:new_stream', function(data) {
+			console.log(data);
+			StreamSettings.get({user_id:1})
+				.then(function(settings){
+					if (data.search_terms !== ''){
+						tweet_tracker.start_stream(settings.current_search_terms);	
+					} 
+					else {
+						tweet_tracker.start_stream(data.search_terms);		
+					}
+					return settings.tweet_frequency;
+				})
+				.then(function(tweet_frequency) {
+					tweet_tracker.stream_to_client(socket, tweet_frequency);
+					socket.emit('server:streaming_tweets');
+				});
+		});
+
 		socket.on('server:update_frequency', function(data){
 			StreamSettings.update_frequency_by_user_id(1, data.tweet_frequency);
 			tweet_tracker.update_frequency(socket, data.tweet_frequency);

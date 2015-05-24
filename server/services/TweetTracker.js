@@ -20,6 +20,9 @@ var tweet_model;
 
 TweetTracker.prototype = {
 	
+	new_stream: function(search_terms) {
+	},
+
 	start_stream: function(search_terms) {
 		this.current_search_terms = search_terms;
 		var self = this;
@@ -28,6 +31,7 @@ TweetTracker.prototype = {
 		});
 		
 		if (this.current_search_terms !== search_terms && this.is_streaming) {
+			this.current_search_terms = search_terms; //SAVE TO DB;
 			this.track_new(search_terms);
 		}
 		else {
@@ -42,7 +46,7 @@ TweetTracker.prototype = {
 			t.track(search_terms);
 		}
 		else {
-			this.start_stream();
+			this.start_stream(search_terms);
 		}
 	},
 	

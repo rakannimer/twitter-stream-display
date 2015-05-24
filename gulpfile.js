@@ -107,8 +107,9 @@ gulp.task('css', function() {
   return gulp.src([ 
     //'./node_modules/bootstrap/dist/css/bootstrap.css',
     './node_modules/codemirror/lib/codemirror.css', './node_modules/magnific-popup/dist/magnific-popup.css' ,'./node_modules/toastr/toastr.css',
-  './node_modules/codemirror/theme/blackboard.css', './node_modules/materialize-css/bin/materialize.css', './public/app/css/main.css'
-//  './public/app/css/*.css'
+  './node_modules/codemirror/theme/blackboard.css', './node_modules/materialize-css/bin/materialize.css', './public/app/css/tweet-dom-creator.css',
+  './public/app/css/main.css'
+  
   
   ])
     .pipe(concat('app.min.css'))
@@ -175,7 +176,7 @@ gulp.task('watch-all',['db'],function() {
 
 
 gulp.task('watch-scripts', ['scripts','css'], function() {
-  gulp.watch(['./public/app/js/*', './public/app/js/lib/*'], [ 'scripts']);
+  gulp.watch(['./public/app/js/*', './public/app/js/lib/*', './public/app/templates/*'], [ 'scripts']);
   gulp.watch(['./public/app/css/*'], ['css']);
 });
 

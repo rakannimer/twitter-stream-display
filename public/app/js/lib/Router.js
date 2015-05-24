@@ -14,6 +14,7 @@ var Router = function() {
 	this.route(this.current_page);
 	map.load_map();
 };
+
 Router.prototype = {
 
 	listen_to_hashchange: function() {

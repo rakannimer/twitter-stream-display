@@ -14,9 +14,13 @@
 
 
 var $ = global.$;
+
 $(document).ready(function(){
 	$('.tooltipped').tooltip({delay: 50});
 });
+
+var Router = require('./lib/Router');
+var router = new Router();
 
 /*
 

@@ -11,7 +11,8 @@ var toastr = require('toastr'),
 			console.log("Warning : variable type supplied to Toast is not valid, default 'info' type provided");
 			type = 'info';	
 		}
-		toastr[type](message);
+		Materialize.toast(message,3000);
+		//toastr[type](message);
 	};
 
 module.exports = new Toast();
