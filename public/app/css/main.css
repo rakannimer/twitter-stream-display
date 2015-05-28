@@ -197,4 +197,55 @@ input#tweet_frequency {
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
+#retweets {
+  height: 173px;
+  overflow: hidden;
+}
+#sentiment {
+	height: 500px;
+}
 
+.card.section {
+	height:705px;
+	overflow: auto;
+	max-height:730px;
+}
+
+.tweets_container_card {
+
+}
+.result {
+	/*font-family: Roboto;
+	font-size: 15px;*/
+	display:none;
+    height: 80px;
+    width: 80px;
+    line-height: 80px;
+
+    -moz-border-radius: 40px; /* or 50% */
+    border-radius: 40px; /* or 50% */
+
+    background-color: white;
+    color: #FF9800;
+    text-align: center;
+    font-size: 2em;
+    font-family: "Helvetica Neue";
+    margin: 0 auto;
+
+}
+
+/*  
+
+	CHARTS 
+
+*/
+
+.c3-tooltip td {
+  color: black;
+}
+
+
+.card .card-action {
+  font-size: 11px;
+  border-top: 1px solid #B6B6B6;
+}

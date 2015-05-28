@@ -80,14 +80,14 @@ TweetTracker.prototype = {
 
 	tweet_received: function(tweet, socket) {
 		var tweet_model = new Tweets({tweet:tweet, search_terms:this.current_search_terms});
-		tweet_model.save(function(err){
+		//tweet_model.save(function(err){
 
-		});
-		Tweets.count().exec(function(err, docs){
-			console.log("err ", err);
-			console.log("docs ", docs);
-		});
-		this.tweet_queue.push(tweet);
+		//});
+		//Tweets.count().exec(function(err, docs){
+		//	console.log("err ", err);
+		//	console.log("docs ", docs);
+		//});
+		//this.tweet_queue.push(tweet);
 	},
 
 	update_frequency: function(socket, tweet_frequency) {

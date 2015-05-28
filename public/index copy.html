@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  	<title> Tweet Miner </title>
+	<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+	<link rel="icon" type="image/png" href="./app/img/logo19.png" />
+
+	
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+  <link href='./app/dist/app.min.css' rel='stylesheet' />
+</head>
+<body>
+	<header>
+		<nav class="top-nav" style="">
+			<div class="nav-wrapper" style="">
+				<div class="row">
+	  				
+	  				<div class="col l12">
+		  				<form>
+					        <div class="input-field header-search">
+					        	<input id="search" type="search" required>
+					        	<label for="search"><i class="mdi-action-search"></i></label>
+					        	<i class="mdi-navigation-close"></i>
+					       	</div>
+					    </form>
+					</div>
+				</div>
+  			</div>
+		</nav>
+
+		<ul id="nav-mobile" class="side-nav fixed">
+
+	    	<li  class="logo">
+	    		<div class="logo_container">
+	    			<a href="#" class="" style = "">
+	    				<img  width="70" src="./app/img/logo19.png" /> 
+	    			</a>
+	    		</div>
+	    	</li>
+		    <li class="active">
+		    	<a href="#.html" class="waves-effect waves-light sidenav-item ">
+		    		Stream Tweets
+		    	</a>
+		    </li>
+		    <li class="">
+		    	<a href="#" class="waves-effect waves-light sidenav-item">
+		    		Write R
+		    	</a>
+		    </li>
+		    <li class="">
+		    	<a href="#" class="waves-effect waves-light sidenav-item">
+		    		Graphs
+		    	</a>
+		    </li>
+	  	</ul>
+<!--	    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a> 
+-->
+
+	</header>
+	<main>
+		<div class="main_container">
+			<div class="row">
+				<div class="col l6">
+		        	<div class="card main-bg section" >
+		        		<div class="card-content">
+		        			<span class="card-title">Sample Analaysis</span>
+		        			<div class="row stats" >
+		        				Geotagged : 
+		        				<span id="geotagged" class="result">
+		        				</span> 
+		        			</div>
+		        			
+		        			<div class="row stats" >
+		        				Languages : 
+		        				<div id="languages" class="result" style="display:none">
+		        					<canvas id="languages_chart" width="300" height="200" ></canvas>
+		        				</div>
+		        			</div>
+		        			<div class="row stats" >
+		        				Avg hashtag per tweet  : 
+		        				<div id="languages" class="result">
+		        					<span id="average_hashtag" class="result">
+		        				</span> 
+		        				</div>
+		        			</div>
+		        			<div class="row stats" >
+		        				Sentiment : 
+		        				<div id="sentiment" class="result" style="display:none">
+		        					<!-- <canvas id="sentiment_chart" width="300" height="200" ></canvas> -->
+		        				</div>
+		        			</div>
+		        			<div class="row stats" >
+		        				Retweets : 
+		        				<div id="retweets" class="result" style="display:none">
+		        					<canvas id="retweet_chart" width="300" height="200" ></canvas>
+		        				</div>
+		        			</div>
+
+		        		</div>
+		        	</div>
+		        </div>
+
+		        <!-- 
+		        Move to Present Section
+		        <div class="col l4">
+		        	<div class="card main-bg">
+		            	<div class="card-content">
+		              		<span class="card-title">Stream Settings</span>
+		              		<div class="row">
+			              		<div id="stream" class="stream-control">
+									<div class="switch">
+										<label>
+											Off
+											<input type="checkbox" id="stream_toggle">
+											<span class="lever "></span>
+											On
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div id="frequency" class="stream-control">
+									
+									<div id="tweet_frequency_label">Delay <i class="fa fa-info-circle tooltipped" data-position="right" data-tooltip="Seconds between tweets" ></i></div>
+									<div class="input-field col l4">
+										<input placeholder="" id="tweet_frequency"  type="text" class="">
+									</div>
+									<div class="col l4" id="update_button_container">
+										<button class="col l12 btn waves-effect waves-light orange" type="submit" id="update_tweet_frequency" name="action">Update
+  										</button>
+  									</div>
+								</div>
+							</div>
+						</div>
+						
+		              </div>
+		        </div>
+		    	-->
+
+		        <div class="col l6">
+		        	<div class="card main-bg section">
+		        		<div class="card-content">
+		        			<span class="card-title">Analyzed Sample </span>
+		        			<div class="tweet_container"  id='tweets' ></div>
+		        		</div>
+		        	</div>
+		        </div>
+		        
+		  	</div>
+		</div>
+	</main>
+	<!-- <footer class="page-footer">
+		<div class="footer-container">
+			<div class="row">
+				Footer
+			</div>
+		</div>
+	</footer> -->
+
+	<!-- Lazy templating :) -->
+	<div id="loading" class="hide">
+		<div class="preloader-wrapper small active loader ">
+	    	<div class="spinner-layer spinner-yellow-only">
+	      		<div class="circle-clipper left">
+	        		<div class="circle"></div>
+	      		</div><div class="gap-patch">
+	        <div class="circle"></div>
+	      </div><div class="circle-clipper right">
+	        <div class="circle"></div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	  <!-- Modal Trigger -->
+  
+	  <div id="test_chart">
+	  </div>
+
+  <a class="waves-effect waves-light btn modal-trigger hide" href="#modal1">Modal</a>
+
+  <!-- Modal Structure -->
+ <div id="modal_container" class="hide">
+ 	<div id="reset_stream_modal" class="modal">
+    	<div class="modal-content">
+    		<h4>Reset Stream on Server ? </h4>
+      		<p>This will reset the stream on the server. Are you sure you want to do that ?</p>
+    	</div>
+    	<div class="modal-footer">
+      		<a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+    	</div>
+ 	</div>
+</div>
+
+	<script src='./app/dist/d3plus.full.min.js'></script>
+	<script src='./app/dist/jquery.min.js'></script>
+	<script src='./app/dist/materialize.js'></script>
+	<script src='./app/dist/app.min.js?1'></script>
+	
+</body>
+</html>
+

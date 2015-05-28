@@ -108,6 +108,7 @@ gulp.task('css', function() {
     //'./node_modules/bootstrap/dist/css/bootstrap.css',
     './node_modules/codemirror/lib/codemirror.css', './node_modules/magnific-popup/dist/magnific-popup.css' ,'./node_modules/toastr/toastr.css',
   './node_modules/codemirror/theme/blackboard.css', './node_modules/materialize-css/bin/materialize.css', './public/app/css/tweet-dom-creator.css',
+  './node_modules/c3/c3.min.css',
   './public/app/css/main.css'
   
   
@@ -128,16 +129,6 @@ gulp.task('scripts', function() {
                 .pipe(source('toastr.min.js'))
                 .pipe(gulp.dest('./node_modules/toastr/'));
 
-
-
- // gulp.src('./public//dist/jquery.min.js')
- //     .pipe(gulp.dest('./public/app/dist/'));
-
-
-//  browserify({entries:['./public/app/js/libs.js'], debug:true})
-//                .bundle()
-//                .pipe(source('lightbox.min.js'))
-//                .pipe(gulp.dest('./node_modules/lightbox/js/'));
   
 
     return browserify({entries:['./public/app/js/client.js','./node_modules/toastr/toastr.min.js'], debug:true})

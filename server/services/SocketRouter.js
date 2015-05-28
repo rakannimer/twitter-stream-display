@@ -34,7 +34,7 @@ var SocketRouter = function() {
 			console.log(data);
 			StreamSettings.get({user_id:1})
 				.then(function(settings){
-					if (data.search_terms !== ''){
+					if (data.search_terms === ''){
 						tweet_tracker.start_stream(settings.current_search_terms);	
 					} 
 					else {
