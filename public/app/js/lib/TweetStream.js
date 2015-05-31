@@ -6,9 +6,20 @@ var tweetDomCreator = require('../tweet-dom-creator.js'),
 	Toast = require('./Toast'),
 	Chart = require('chart.js'),
 	chart = require('./Charts'),
-	language_codes = require('../language_codes')
+	language_codes = require('../language_codes'),
+	React = require('react'),
+	CardRow = require('../components/Cards/CardRow')
 	;
 	//d3plus = require('d3plus');
+
+
+var cards = [{title:"Geotagged Tweets",result:""}, {title:"Hashtags",result:"2"}, {title:"Sentiment",result:"2"}, {title:"Retweets",result:"2"}];
+
+React.render(<CardRow cards={cards}/>, document.getElementById('content'));
+
+setTimeout(function(){
+	alert("Going to change something");
+}, 2000);
 
 var TweetStream = function() {
 	var self = this;

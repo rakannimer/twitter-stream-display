@@ -7,16 +7,19 @@ var gulp = require('gulp'),
     rename    = require('gulp-rename'),
     minifyCSS = require('gulp-minify-css'),
     fs = require('fs'),
+
     nodemon = require('gulp-nodemon'),
     streamify = require('gulp-streamify'),
     stringify = require('stringify'),
+    reactify = require('reactify'),
+    watchify= require('watchify'),
     //exec = require('gulp-exec'),
     exec = require('child_process').exec,
     gulpSCP = require('gulp-scp'),
   	
     argv = require('yargs').argv,
-    
-    
+    gutil = require('gulp-util'),
+    notify = require('gulp-notify'),
     remoteHost = '188.226.154.63',
     username = 'root',
     port = 22,
@@ -42,6 +45,48 @@ var gulp = require('gulp'),
        privateKey: privateKey
       }
     });
+
+function handleError(task) {
+  return function(err) {
+    gutil.log(gutil.colors.red(err));
+    notify.onError(task + ' failed, check the logs..')(err);
+
+  };
+}
+
+function scripts(watch) {
+
+  // Inspired by http://blog.avisi.nl/2014/04/25/how-to-keep-a-fast-build-with-browserify-and-reactjs/
+
+  var bundler, rebundle;
+  bundler = browserify( {
+    entries:['./public/app/js/client.js'],
+    basedir: __dirname, 
+    debug: true, 
+    cache: {}, // required for watchify
+    packageCache: {}, // required for watchify
+    fullPaths: watch // required to be true only for watchify
+  });
+
+  if(watch) {
+    bundler = watchify(bundler) 
+  }
+ 
+  bundler.transform(stringify(['.html']));
+  bundler.transform(reactify);
+ 
+  rebundle = function() {
+    var stream = bundler.bundle();
+    stream.on('error', handleError('Browserify'));
+    stream = stream.pipe(source('app.min.js'));
+    return stream.pipe(gulp.dest('./public/app/dist/'));
+  };
+ 
+  bundler.on('update', rebundle);
+  return rebundle();
+
+
+}
 
 
 gulp.task('copy-creds',function(){
@@ -123,19 +168,17 @@ gulp.task('css', function() {
 // Concatenate & Minify JS
 gulp.task('scripts', function() {
 
-  browserify({entries:['./node_modules/toastr/toastr.js'], debug:true})
-                .transform('debowerify')
+  //scripts(false);
+  //return;
+    
+
+     return browserify({entries:['./public/app/js/client.js'], debug:true})
+               .transform(reactify)
+               .transform(stringify(['.html']))
                 .bundle()
-                .pipe(source('toastr.min.js'))
-                .pipe(gulp.dest('./node_modules/toastr/'));
-
-  
-
-    return browserify({entries:['./public/app/js/client.js','./node_modules/toastr/toastr.min.js'], debug:true})
-              .transform(stringify(['.html']))
-               .bundle()
-               .pipe(source('app.min.js'))
-               .pipe(gulp.dest('./public/app/dist/'));
+                .pipe(source('app.min.js'))
+                .pipe(gulp.dest('./public/app/dist/'))
+                .pipe(notify("JS compiled"));
 
 });
 
@@ -167,7 +210,9 @@ gulp.task('watch-all',['db'],function() {
 
 
 gulp.task('watch-scripts', ['scripts','css'], function() {
-  gulp.watch(['./public/app/js/*', './public/app/js/lib/*', './public/app/templates/*'], [ 'scripts']);
+  //scripts(true);
+  //gulp.watch('./public/app/js/*',['scripts']);
+  gulp.watch(['./public/app/js/*', './public/app/js/components/**/*', './public/app/templates/*'], [ 'scripts']);
   gulp.watch(['./public/app/css/*'], ['css']);
 });
 

@@ -64,7 +64,7 @@ var Twitter = require('twitter-node-client').Twitter,
  					tweets: tweets,
  					tweet_count_by_language: languages,
 					geotagged_percentage: geotagged_percent,
-					hashtag_stats: hashtag_stats,
+					hashtags: hashtag_stats,
 					sentiment: sentiment_stats,
 					retweets: retweets_stats,
 					favorites: favorite_stats,
@@ -89,8 +89,8 @@ var Twitter = require('twitter-node-client').Twitter,
 			};
 			var stats = this.get_stats(favorite_counts);
 			var result = {
-				favorite_stats : stats,
-				favorite_counts : favorite_counts,
+				stats : stats,
+				counts : favorite_counts,
 				tweet_ids : tweet_ids
 			};
 			return result;
@@ -105,8 +105,8 @@ var Twitter = require('twitter-node-client').Twitter,
 			};
 			var stats = this.get_stats(retweet_counts);
 			var result = {
-				retweet_stats : stats,
-				retweet_counts : retweet_counts,
+				stats : stats,
+				counts : retweet_counts,
 				tweet_ids : tweet_ids
 			};
 			return result;
@@ -128,8 +128,8 @@ var Twitter = require('twitter-node-client').Twitter,
 			var stats = this.get_stats(sentiment_scores);
 			
 			var result = {
-				sentiment_stats : stats,
-				sentiment_scores: sentiment_scores,
+				stats : stats,
+				counts: sentiment_scores,
 				tweet_ids : tweet_ids
 			};
 			return result;
@@ -161,7 +161,12 @@ var Twitter = require('twitter-node-client').Twitter,
 				hashtag_count.push(tweets.statuses[i].entities.hashtags.length);
 			}
 
-			return this.get_stats(hashtag_count);
+			var stats =  this.get_stats(hashtag_count);
+			var result = {
+				stats : stats,
+				counts: hashtag_count
+			};
+			return result;
 		},
 
 		more_search: function(query, tweets) {

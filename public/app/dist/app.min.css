@@ -9403,3 +9403,12 @@ input#tweet_frequency {
   font-size: 11px;
   border-top: 1px solid #B6B6B6;
 }
+
+.show-result {
+	display:block !important;
+}
+
+.headline-card {
+	font-family: Verdana
+}
+

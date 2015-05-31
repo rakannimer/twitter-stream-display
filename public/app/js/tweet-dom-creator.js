@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var $ = require('jquery');
 var tweetTemplate = require('../templates/tweet-dom.html');
+
 var linkify = require('html-linkify');
 
 var tweetDomCreator = {
