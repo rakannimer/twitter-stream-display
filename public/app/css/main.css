@@ -153,7 +153,8 @@ input#tweet_frequency {
 .card .card-title {
 	border-bottom: solid 1px white;
   	padding-bottom: 5px;
-	font-size: 12px;
+	font-size: 17px;
+	font-weight: bold;
 }
 .stream-control {
 	margin-top:12px;
@@ -257,4 +258,10 @@ input#tweet_frequency {
 .headline-card {
 	font-family: Verdana
 }
-
+.stats-result {
+	font-size:13px;
+}
+.stats-result-list {
+	margin-top:0px;
+	margin-bottom:0px;
+}

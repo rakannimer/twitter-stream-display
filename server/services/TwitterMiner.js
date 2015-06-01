@@ -55,6 +55,7 @@ var Twitter = require('twitter-node-client').Twitter,
 			.then(function(tweets){
 				var languages = self.group_by_language.call(self, tweets);
 				var geotagged_percent = self.get_geotagged_percentage.call(self, tweets);
+				//Move to same function and return metadata object
 				var hashtag_stats = self.hashtag_stats.call(self, tweets);
  				var sentiment_stats = self.get_sentiment(tweets);
  				var retweets_stats = self.get_retweets.call(self, tweets);
@@ -80,18 +81,27 @@ var Twitter = require('twitter-node-client').Twitter,
 
 		},
 
+
 		get_favorites: function(tweets) {
 			var favorite_counts = [];
 			var tweet_ids = [];
+			var rows = [];
+			// Move this to client by creating a DataTable object and adding them as column
+			// rows should contain raw data only.
+			rows.push(['Tweet Id', 'Favorites Count']);
 			for (var i = tweets.statuses.length - 1; i >= 0; i--) {
 				favorite_counts.push(tweets.statuses[i].favorite_count);
+				rows.push([tweets.statuses[i].id, tweets.statuses[i].retweet_count]);
+
 				tweet_ids.push(tweets.statuses[i].id);
 			};
 			var stats = this.get_stats(favorite_counts);
 			var result = {
 				stats : stats,
 				counts : favorite_counts,
-				tweet_ids : tweet_ids
+				tweet_ids : tweet_ids,
+				data_rows: rows
+
 			};
 			return result;
 		},
@@ -99,15 +109,20 @@ var Twitter = require('twitter-node-client').Twitter,
 		get_retweets: function(tweets) {
 			var retweet_counts = [];
 			var tweet_ids = [];
+			var rows = [];
+			rows.push(['Tweet Id', 'Retweet Count']);
 			for (var i = tweets.statuses.length - 1; i >= 0; i--) {
 				retweet_counts.push(tweets.statuses[i].retweet_count);
 				tweet_ids.push(tweets.statuses[i].id);
+				rows.push([tweets.statuses[i].id, tweets.statuses[i].retweet_count]);
+
 			};
 			var stats = this.get_stats(retweet_counts);
 			var result = {
 				stats : stats,
 				counts : retweet_counts,
-				tweet_ids : tweet_ids
+				tweet_ids : tweet_ids,
+				data_rows: rows
 			};
 			return result;
 
@@ -116,21 +131,26 @@ var Twitter = require('twitter-node-client').Twitter,
 		get_sentiment: function(tweets) {
 			var sentiment_scores = [];
 			var tweet_ids = [];
+			var rows = [];
+			rows.push(['Tweet Id', 'Sentiment Score']);
 			//sentiment = {"value": tweets.statuses[i].id, "weight": sentiment_score}
 			for (var i = tweets.statuses.length - 1; i >= 0; i--) {
 				
+
 				var sentiment_score = sentiment(tweets.statuses[i].text).score;
-				//sentiment_scores.push({'sentiment_score':sentiment_score});
+
+				rows.push([tweets.statuses[i].id, sentiment_score]);
 				sentiment_scores.push(sentiment_score);
-				//sentiment_scores.push({"value": i, "weight": parseInt(sentiment_score), "name" : ""+sentiment_score});
-				tweet_ids.push(tweets.statuses[i].id)
+//				tweet_ids.push(tweets.statuses[i].id)
 			}
+
 			var stats = this.get_stats(sentiment_scores);
 			
 			var result = {
 				stats : stats,
 				counts: sentiment_scores,
-				tweet_ids : tweet_ids
+				tweet_ids : tweet_ids,
+				data_rows: rows
 			};
 			return result;
 
@@ -157,14 +177,19 @@ var Twitter = require('twitter-node-client').Twitter,
 
 		hashtag_stats: function(tweets) {
 			var hashtag_count = [];
+			var rows = [];
+			rows.push(['Tweet Id', 'Hashtag Count']);
 			for (var i = 0; i < tweets.statuses.length; i++) {
 				hashtag_count.push(tweets.statuses[i].entities.hashtags.length);
+				rows.push([tweets.statuses[i].id, tweets.statuses[i].entities.hashtags.length]);
+
 			}
 
 			var stats =  this.get_stats(hashtag_count);
 			var result = {
 				stats : stats,
-				counts: hashtag_count
+				counts: hashtag_count,
+				data_rows: rows
 			};
 			return result;
 		},

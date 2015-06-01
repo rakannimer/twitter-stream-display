@@ -2,9 +2,7 @@ var AppActions = require('../actions/app-actions');
 var $ = require('jquery');
 var Reflux = require('reflux');
 
-function roundToTwo(num) {    
-    return +(Math.round(num + "e+2")  + "e-2");
-}
+
 
 var CardStore = Reflux.createStore({
 	search_terms: '',
@@ -32,30 +30,42 @@ var CardStore = Reflux.createStore({
 			//	stats : null
 			//}
 			self.cards['favorites'] = {
-				headline : roundToTwo(response.data.favorites.stats.mean),
+				headline : response.data.favorites.stats.mean.roundToTwo(),
 				stats: response.data.favorites.stats,
 				data : response.data.favorites,
+				counts: response.data.favorites.counts,
+				tweet_ids : response.data.favorites.tweet_ids,
+				data_rows : response.data.favorites.data_rows,
 				type : 'favorites'
 			};
 
 			self.cards['hashtags'] = {
-				headline : roundToTwo(response.data.hashtags.stats.mean),
+				headline : response.data.hashtags.stats.mean.roundToTwo(),
 				stats: response.data.hashtags.stats,
 				data : response.data.hashtags,
+				counts : response.data.hashtags.counts,
+				tweet_ids : response.data.favorites.tweet_ids,
+				data_rows : response.data.hashtags.data_rows,
 				type: 'hashtags'
 			};
 
 			self.cards['retweets'] = {
-				headline : roundToTwo(response.data.retweets.stats.mean),
+				headline : response.data.retweets.stats.mean.roundToTwo(),
 				stats: response.data.retweets.stats,
 				data : response.data.retweets,
+				counts: response.data.retweets.counts,
+				tweet_ids : response.data.retweets.tweet_ids,
+				data_rows : response.data.retweets.data_rows,
 				type: 'retweets'
 			};
 
 			self.cards['sentiment'] = {
-				headline : response.data.sentiment.stats.mean,
+				headline : response.data.sentiment.stats.mean.roundToTwo(),
 				stats: response.data.sentiment.stats,
 				data : response.data.sentiment,
+				counts: response.data.sentiment.counts,
+				tweet_ids : response.data.sentiment.tweet_ids,
+				data_rows : response.data.sentiment.data_rows,
 				type: 'sentiment'
 			};
 
