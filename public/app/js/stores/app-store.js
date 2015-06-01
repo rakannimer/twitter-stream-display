@@ -7,7 +7,10 @@ var Reflux = require('reflux');
 var CardStore = Reflux.createStore({
 	search_terms: '',
 	cards: {},
+	tweets: [],
+	filtered_tweets: [],
 	init: function() {
+
 	},
 
 	get_card_state: function() {
@@ -18,17 +21,29 @@ var CardStore = Reflux.createStore({
 
 	listenables: [AppActions],
 
-	post_search: function() {
+	filter_tweets: function(tweet_id) {
+
+		this.filtered_tweets = [];
+		for (var i = this.tweets.length - 1; i >= 0; i--) {
+			if (this.tweets[i].id === tweet_id) {
+				console.log(this.tweets[i]);
+				this.filtered_tweets.push(this.tweets[i]);
+				console.log(this.tweets[i]);
+			}
+		}
+		//this.tweets = this.filtered_tweets;
+		this.trigger('TWEETS_FILTERED');
+
+	},
+
+	post_search: function(query) {
 		
 		var self = this;
 		//this.show_history_loading();
-		$.post('/mine/history_from_api', {search_query: "ASDASD"}, function(response) {
+
+		$.post('/mine/history_from_api', {search_query: query}, function(response) {
 			if (response.status !== 'OK') { console.log("error ", response); return;}
 
-			//self.cards['geotagged'] = {
-			//	headline: roundToTwo(response.data.geotagged_percentage),
-			//	stats : null
-			//}
 			self.cards['favorites'] = {
 				headline : response.data.favorites.stats.mean.roundToTwo(),
 				stats: response.data.favorites.stats,
@@ -69,11 +84,13 @@ var CardStore = Reflux.createStore({
 				type: 'sentiment'
 			};
 
+			self.tweets = response.data.tweets.statuses;
+			self.filtered_tweets = response.data.tweets.statuses;
+
 			self.trigger('CARDS_RECEIVED');
-			//this.render_history(response.data);
-			//this.render_sentiment(response.data.sentiment);
-			//this.render_tweets(response.data.tweets.statuses);
-			//this.render_retweets(response.data.retweets);
+
+			
+			
 		});
 		
 	}

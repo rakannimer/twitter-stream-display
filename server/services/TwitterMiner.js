@@ -53,14 +53,20 @@ var Twitter = require('twitter-node-client').Twitter,
 			console.log("Starting Search");
 			this.search(recent_query)
 			.then(function(tweets){
-				var languages = self.group_by_language.call(self, tweets);
-				var geotagged_percent = self.get_geotagged_percentage.call(self, tweets);
-				//Move to same function and return metadata object
-				var hashtag_stats = self.hashtag_stats.call(self, tweets);
- 				var sentiment_stats = self.get_sentiment(tweets);
- 				var retweets_stats = self.get_retweets.call(self, tweets);
- 				var favorite_stats = self.get_favorites.call(self, tweets);
+				var metadata = self.get_metadata.call(self, tweets);
 
+				var languages = self.group_by_language.call(self, tweets);
+				
+				var geotagged_percent = self.get_geotagged_percentage.call(self, tweets);
+												
+				var hashtag_stats = self.get_hashtag_stats.call(self, tweets);
+
+ 				var sentiment_stats = self.get_sentiment.call(self, tweets);
+ 				
+ 				var retweets_stats = self.get_retweets.call(self, tweets);
+
+ 				var favorite_stats = self.get_favorites.call(self, tweets);
+ 				
  				deferred.resolve({
  					tweets: tweets,
  					tweet_count_by_language: languages,
@@ -69,6 +75,7 @@ var Twitter = require('twitter-node-client').Twitter,
 					sentiment: sentiment_stats,
 					retweets: retweets_stats,
 					favorites: favorite_stats,
+					metadata: metadata
 
  				})
 			})
@@ -81,6 +88,92 @@ var Twitter = require('twitter-node-client').Twitter,
 
 		},
 
+		get_metadata: function(tweets) {
+			
+			//HAH
+			var MetaDatum = function() {
+				//raw is an array of integers 
+				this.raw = [];
+				this.stats = {};
+				this.compute_stats = function() {
+					var stats = {
+						raw : this.raw,
+						mean : ss.mean(this.raw),
+						std_dev : ss.standard_deviation(this.raw),
+						median : ss.median(this.raw),
+						max : ss.max(this.raw),
+						min : ss.min(this.raw),
+					}
+					this.stats = stats;
+					return stats;
+				};
+				this.toJSON = function() {
+					return {
+						raw: this.raw,
+						stats: this.stats
+					}
+				}
+
+			};
+
+			var MetaData = function() {
+				this.graph_rows = [];
+				this.favorites = new MetaDatum();
+				this.hashtags = new MetaDatum();
+				this.sentiment = new MetaDatum();
+				this.retweets = new MetaDatum();
+
+				this.set_from_tweet= function(tweet) {
+
+					var tweet_id = tweets.statuses[i].id_str,
+					favorite_count = tweets.statuses[i].favorite_count,
+					retweet_count = tweets.statuses[i].retweet_count,
+					sentiment_score = sentiment(tweets.statuses[i].text).score,
+					hashtag_count = tweets.statuses[i].entities.hashtags.length;
+				
+					this.graph_rows.push([tweet_id, favorite_count, retweet_count, sentiment_score, hashtag_count ]);
+					
+					this.favorites.raw.push(favorite_count);
+					this.hashtags.raw.push(hashtag_count);
+					this.sentiment.raw.push(sentiment_score);
+					this.retweets.raw.push(retweet_count);
+				};
+
+				this.compute_stats =  function() {
+					this.favorites.compute_stats();
+					this.hashtags.compute_stats();
+					this.sentiment.compute_stats();
+					this.retweets.compute_stats();
+				};
+				
+				this.toJSON = function() {
+					return {
+
+						graph_rows : this.graph_rows,
+						favorites: this.favorites.toJSON(),
+						hashtags: this.hashtags.toJSON(),
+						sentiment: this.sentiment.toJSON(),
+						retweets: this.retweets.toJSON()
+					};
+				};
+				
+			};
+
+			var meta = new MetaData();
+			
+
+
+			for (var i = tweets.statuses.length - 1; i >= 0; i--) {
+				meta.set_from_tweet(tweets.statuses[i]);
+			}
+
+			meta.compute_stats();
+		
+			//console.log(meta);
+			
+			return meta.toJSON();
+
+		},
 
 		get_favorites: function(tweets) {
 			var favorite_counts = [];
@@ -92,7 +185,7 @@ var Twitter = require('twitter-node-client').Twitter,
 			for (var i = tweets.statuses.length - 1; i >= 0; i--) {
 				favorite_counts.push(tweets.statuses[i].favorite_count);
 				rows.push([tweets.statuses[i].id, tweets.statuses[i].retweet_count]);
-
+				console.log([tweets.statuses[i].id, tweets.statuses[i].retweet_count]);
 				tweet_ids.push(tweets.statuses[i].id);
 			};
 			var stats = this.get_stats(favorite_counts);
@@ -175,10 +268,12 @@ var Twitter = require('twitter-node-client').Twitter,
 			return geotagged/(geotagged+not_geotagged)*100;
 		},
 
-		hashtag_stats: function(tweets) {
+		get_hashtag_stats: function(tweets) {
 			var hashtag_count = [];
 			var rows = [];
+
 			rows.push(['Tweet Id', 'Hashtag Count']);
+			
 			for (var i = 0; i < tweets.statuses.length; i++) {
 				hashtag_count.push(tweets.statuses[i].entities.hashtags.length);
 				rows.push([tweets.statuses[i].id, tweets.statuses[i].entities.hashtags.length]);
@@ -362,19 +457,21 @@ var Twitter = require('twitter-node-client').Twitter,
 
 			return tweets_by_language;
 		},
-
-		
-		get_stats: function(number_array) {
+		get_stats:  function(raw) {
 			var stats = {
-				scores : number_array,
-				mean : ss.mean(number_array),
-				std_dev : ss.standard_deviation(number_array),
-				median : ss.median(number_array),
-				max : ss.max(number_array),
-				min : ss.min(number_array),
+				raw : raw,
+				mean : ss.mean(raw),
+				std_dev : ss.standard_deviation(raw),
+				median : ss.median(raw),
+				max : ss.max(raw),
+				min : ss.min(raw),
 			}
+			this.stats = stats;
 			return stats;
 		}
+
+		
+		
 
 	};	
 

@@ -1,6 +1,6 @@
 var React = require('react');
 var Card = require('./card')
-
+var TweetStream = require('../TweetStreamer/TweetStream');
 var cards = [
  // {title:"Geotagged Tweets", type :"geotagged"},
   {title:"Hashtags", type:"hashtags"},
@@ -32,7 +32,7 @@ var CardRow = React.createClass({
              </div>
   	 	   </div>
         </div>
-
+        <TweetStream />
       </div>
   	);
   },

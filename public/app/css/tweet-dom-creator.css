@@ -119,3 +119,14 @@
       /* width: 450px !important; */
 }
 
+.favoriteStar {
+    float:left;
+}
+
+.favoriteCount {
+    padding-top: 5px;
+    font-family: Verdana;
+    font-size: 14px;
+    padding-left: 35px;
+}
+}

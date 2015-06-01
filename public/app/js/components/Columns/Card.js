@@ -40,7 +40,9 @@ var Card = React.createClass({
     	var self = this;
 
     	AppStore.listen(function(data){
-        
+        if (data !== 'CARDS_RECEIVED') {
+          return;
+        }
         var card_data = AppStore.cards[self.props.type];
         self.setState({'loaded' : true});
     		self.setState({'headline': card_data.headline });

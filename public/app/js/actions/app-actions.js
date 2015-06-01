@@ -1,7 +1,8 @@
 var Reflux = require('reflux');
 
 var AppActions = Reflux.createActions(
-	["post_search"]
+	["post_search"],
+	["filter_tweets"]
 );
 
 

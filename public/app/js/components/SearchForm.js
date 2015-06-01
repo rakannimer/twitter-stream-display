@@ -11,7 +11,7 @@ var SearchForm = React.createClass({
 
   handleKeyDown: function(e) {
     if (e.keyCode === 13) {
-      AppStore.post_search("asd")
+      AppStore.post_search(e.target.value);
 
     }
   },

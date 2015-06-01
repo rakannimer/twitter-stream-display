@@ -23,6 +23,10 @@ var Card = React.createClass({
     	var self = this;
 
     	AppStore.listen(function(data){
+        alert(data);
+        if (data !== 'CARDS_RECEIVED') {
+          return;
+        }
     		console.log("Received Data from store", data);
         console.log(self.props);
         var card_data = AppStore.cards[self.props.type];
@@ -58,7 +62,9 @@ var Card = React.createClass({
               </ul>
           </div>
 				</div>
+        
         <ScatterPlot type={this.props.type}  />
+
 				<div className="card-action">
 					<a href="#">More Data</a>
 				</div>

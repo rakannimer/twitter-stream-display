@@ -1,6 +1,8 @@
 
 var React = require('react');
 var GoogleChartLoader = require('./GoogleChartLoader');
+var AppStore = require('../../stores/app-store');
+
 console.log(GoogleChartLoader);
 
 var wrapper = null;
@@ -44,31 +46,48 @@ var GoogleLineChart = React.createClass({
 
   drawCharts: function() {
     
-    
-
     console.log("Drawing Chart");
     if (this.props.dataTable.length === 0){
       return;
     }
-    console.log("wrapper before : ",this.wrapper);
+
 
     //Read options from prop
     
+    var self = this;
     if (this.wrapper == null) {
       this.wrapper = new google.visualization.ChartWrapper({
         chartType: 'ScatterChart',
         dataTable: this.props.dataTable,
-        options: {legend: { position: 'bottom' }, pointSize: 2, curveType: 'function', explorer: {}, colors: ['#29abe1'],},
+        options: {legend: { position: 'bottom' }, pointSize: 2, curveType: 'function', explorer: {}, colors: ['#29abe1'], }, //tooltip: {trigger:'none'}},
         containerId: this.props.graphName
       });
+
+      google.visualization.events.addListener(this.wrapper, 'ready', function () {
+        google.visualization.events.addListener(self.wrapper.getChart(), 'select', function() {
+          var selected_point = self.wrapper.getChart().getSelection();
+          
+          console.log(selected_point[0].row);
+          console.log(self.props.dataTable)
+          //Change after changing datatable type
+          var row = selected_point[0].row+1;
+          var tweet_id = self.props.dataTable[row][0];
+          
+          console.log(tweet_id);
+          AppStore.filter_tweets(tweet_id);
+
+
+        });
+      });
+
       
+
     }
     else {
       console.log(this.props.dataTable);
       this.wrapper.setDataTable(this.props.dataTable);
     }
 
-    console.log("wrapper : ",this.wrapper);
     $("#"+this.props.graphName).show();
 
     this.wrapper.draw();

@@ -155,6 +155,7 @@ input#tweet_frequency {
   	padding-bottom: 5px;
 	font-size: 17px;
 	font-weight: bold;
+	font-family:Verdana;
 }
 .stream-control {
 	margin-top:12px;
